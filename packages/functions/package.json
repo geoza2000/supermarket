@@ -1,0 +1,29 @@
+{
+  "name": "@supermarket-list/functions",
+  "version": "1.0.0",
+  "private": true,
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "sync": "node scripts/sync-local-packages.mjs",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": "20"
+  },
+  "dependencies": {
+    "@supermarket-list/shared": "file:./local-packages/shared",
+    "dotenv": "^16.4.5",
+    "firebase-admin": "^12.0.0",
+    "firebase-functions": "^7.0.3",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  }
+}

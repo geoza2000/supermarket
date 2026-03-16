@@ -1,0 +1,35 @@
+{
+  "name": "supermarket-list",
+  "version": "1.0.0",
+  "private": true,
+  "description": "An app that helps you with the grocery list, from preparing to buying with the correct aisle order. Skip nothing next time you shop.",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @supermarket-list/dashboard",
+    "dev:website": "npm run dev -w @supermarket-list/website",
+    "build": "npm run build -ws",
+    "build:shared": "npm run build -w @supermarket-list/shared",
+    "build:functions": "npm run build -w @supermarket-list/functions",
+    "build:dashboard": "npm run build -w @supermarket-list/dashboard",
+    "build:website": "npm run build -w @supermarket-list/website",
+    "sync:functions": "npm run sync -w @supermarket-list/functions",
+    "emulate": "npm run build:shared && npm run sync:functions && npm run build:functions && npx firebase-tools emulators:start --only firestore,functions",
+    "deploy": "npx firebase-tools deploy",
+    "deploy:functions": "npx firebase-tools deploy --only functions",
+    "deploy:hosting": "npx firebase-tools deploy --only hosting",
+    "lint": "npm run lint -ws --if-present",
+    "typecheck": "npm run typecheck -ws --if-present",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.0",
+    "@commitlint/config-conventional": "^19.6.0",
+    "husky": "^9.1.7",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

@@ -1,0 +1,10 @@
+#!/bin/sh
+# Validate all commits being pushed with commitlint (conventional commits)
+while read local_ref local_sha remote_ref remote_sha; do
+  # Skip if new branch (no remote ref yet)
+  if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
+    continue
+  fi
+  npx --no -- commitlint --from "$remote_sha" --to "$local_sha" || exit 1
+done
+exit 0

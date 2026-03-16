@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+**/functions/lib/
+dev-dist/
+shared-pkg/
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
+
+# Environment files
+.env
+.env.local
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+pubsub-debug.log
+ui-debug.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Testing
+coverage/
+
+# Misc
+*.local
+.turbo
