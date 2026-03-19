@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Menu, X } from 'lucide-react';
-import { APP_URL } from '@/config/constants';
+import { Menu, X, Github } from 'lucide-react';
+import { APP_URL, GITHUB_URL } from '@/config/constants';
 
 const NAV_LINKS = [
   { label: 'Features', href: '#features' },
@@ -45,6 +45,15 @@ export default function Navbar() {
             </a>
           ))}
           <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 rounded-lg text-surface-900/60 hover:text-surface-900 hover:bg-surface-100 transition-colors"
+            aria-label="GitHub"
+          >
+            <Github size={20} />
+          </a>
+          <a
             href={APP_URL}
             target="_blank"
             rel="noopener noreferrer"
@@ -76,6 +85,16 @@ export default function Navbar() {
                 {link.label}
               </a>
             ))}
+            <a
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileOpen(false)}
+              className="py-2 text-sm font-medium text-surface-900/70 hover:text-brand-600 transition-colors inline-flex items-center gap-2"
+            >
+              <Github size={16} />
+              GitHub
+            </a>
             <a
               href={APP_URL}
               target="_blank"

@@ -87,7 +87,7 @@ This is a **monorepo** with four packages. The `shared` package provides types a
 ### Installation
 
 ```bash
-git clone https://github.com/<your-username>/supermarket-list.git
+git clone https://github.com/geoza2000/supermarket.git
 cd supermarket-list
 npm install
 ```
@@ -141,9 +141,13 @@ npm run deploy:hosting
 | `npm run lint` | Lint all packages |
 | `npm run typecheck` | Type-check all packages |
 
+## Contributing
+
+Contributions are welcome! Feel free to open an issue or submit a pull request.
+
 ## License
 
-This project is private and not licensed for redistribution.
+This project is open source and available under the [MIT License](LICENSE).
 
 ---
 

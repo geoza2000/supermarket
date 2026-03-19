@@ -1,4 +1,5 @@
-import { APP_URL } from '@/config/constants';
+import { Github } from 'lucide-react';
+import { APP_URL, GITHUB_URL } from '@/config/constants';
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -28,6 +29,15 @@ export default function Footer() {
               className="hover:text-brand-600 transition-colors"
             >
               Open App
+            </a>
+            <a
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-brand-600 transition-colors inline-flex items-center gap-1.5"
+            >
+              <Github size={16} />
+              GitHub
             </a>
           </nav>
 
