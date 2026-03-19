@@ -257,7 +257,7 @@ export function ShoppingListPage() {
         <QuickAddBar
           householdId={householdId}
           products={products}
-          pendingItems={pendingItems}
+          currentItems={items}
           onScanBarcode={() => setScannerOpen(true)}
           onOpenFullForm={handleOpenFullForm}
         />

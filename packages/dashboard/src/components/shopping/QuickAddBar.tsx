@@ -10,7 +10,7 @@ import type { ProductDocument, ShoppingItemDocument } from '@supermarket-list/sh
 interface QuickAddBarProps {
   householdId: string;
   products: ProductDocument[];
-  pendingItems: ShoppingItemDocument[];
+  currentItems: ShoppingItemDocument[];
   onScanBarcode: () => void;
   onOpenFullForm: (prefillName?: string) => void;
 }
@@ -21,7 +21,7 @@ const MAX_SEARCH_RESULTS = 8;
 export function QuickAddBar({
   householdId,
   products,
-  pendingItems,
+  currentItems,
   onScanBarcode,
   onOpenFullForm,
 }: QuickAddBarProps) {
@@ -32,17 +32,17 @@ export function QuickAddBar({
   const barRef = useRef<HTMLDivElement>(null);
   const addItemMutation = useAddItem();
 
-  const pendingProductIds = useMemo(
-    () => new Set(pendingItems.map((item) => item.productId)),
-    [pendingItems]
+  const activeProductIds = useMemo(
+    () => new Set(currentItems.map((item) => item.productId)),
+    [currentItems]
   );
 
   const barcodelessSuggestions = useMemo(() => {
     return products
-      .filter((p) => p.barcode === null && !pendingProductIds.has(p.productId))
+      .filter((p) => p.barcode === null && !activeProductIds.has(p.productId))
       .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
       .slice(0, MAX_CHIPS);
-  }, [products, pendingProductIds]);
+  }, [products, activeProductIds]);
 
   const searchResults = useMemo(() => {
     if (!query || query.length < 2) return [];
@@ -52,9 +52,9 @@ export function QuickAddBar({
       .slice(0, MAX_SEARCH_RESULTS)
       .map((p) => ({
         ...p,
-        isInList: pendingProductIds.has(p.productId),
+        isInList: activeProductIds.has(p.productId),
       }));
-  }, [query, products, pendingProductIds]);
+  }, [query, products, activeProductIds]);
 
   const handleQuickAdd = useCallback(
     async (product: ProductDocument) => {
