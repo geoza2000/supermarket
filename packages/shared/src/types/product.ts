@@ -4,6 +4,7 @@ export interface Product {
   productId: string;
   householdId: string;
   name: string;
+  brand: string | null;
   barcode: string | null;
   shopId: string | null;
   category: string | null;
@@ -17,6 +18,7 @@ export interface ProductDocument {
   productId: string;
   householdId: string;
   name: string;
+  brand: string | null;
   barcode: string | null;
   shopId: string | null;
   category: string | null;
@@ -31,6 +33,7 @@ export type ProductAction = 'create' | 'update' | 'delete';
 export interface CreateProductInput {
   householdId: string;
   name: string;
+  brand?: string | null;
   barcode?: string | null;
   shopId?: string | null;
   category?: string | null;
@@ -42,6 +45,7 @@ export interface UpdateProductInput {
   householdId: string;
   productId: string;
   name?: string;
+  brand?: string | null;
   barcode?: string | null;
   shopId?: string | null;
   category?: string | null;
@@ -62,6 +66,7 @@ export type ManageProductInput =
 export const CreateProductSchema = z.object({
   householdId: z.string().min(1),
   name: z.string().min(1).max(200).trim(),
+  brand: z.string().max(200).nullable().optional(),
   barcode: z.string().max(50).nullable().optional(),
   shopId: z.string().nullable().optional(),
   category: z.string().max(100).nullable().optional(),
@@ -73,6 +78,7 @@ export const UpdateProductSchema = z.object({
   householdId: z.string().min(1),
   productId: z.string().min(1),
   name: z.string().min(1).max(200).trim().optional(),
+  brand: z.string().max(200).nullable().optional(),
   barcode: z.string().max(50).nullable().optional(),
   shopId: z.string().nullable().optional(),
   category: z.string().max(100).nullable().optional(),

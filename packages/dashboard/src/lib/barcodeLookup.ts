@@ -38,13 +38,8 @@ async function queryOpenFacts(
   if (data.status !== 1 || !data.product) return NOT_FOUND;
 
   const product = data.product;
-  const rawName: string | null = product.product_name || null;
+  const name: string | null = product.product_name || null;
   const brand: string | null = product.brands || null;
-  const name = rawName
-    ? brand && !rawName.toLowerCase().includes(brand.toLowerCase())
-      ? `${rawName} (${brand})`
-      : rawName
-    : null;
 
   const categoriesTags: string[] = product.categories_tags_en || [];
   const category =

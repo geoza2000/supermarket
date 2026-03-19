@@ -39,6 +39,7 @@ export type ShoppingItemAction = 'add' | 'update' | 'complete' | 'uncomplete' | 
 export interface AddItemInput {
   householdId: string;
   name: string;
+  brand?: string | null;
   productId?: string;
   barcode?: string | null;
   quantity?: number | null;
@@ -94,6 +95,7 @@ export interface CloseShoppingSessionResult {
 export const AddItemSchema = z.object({
   householdId: z.string().min(1),
   name: z.string().min(1).max(200).trim(),
+  brand: z.string().max(200).nullable().optional(),
   productId: z.string().optional(),
   barcode: z.string().max(50).nullable().optional(),
   quantity: z.number().positive().nullable().optional(),

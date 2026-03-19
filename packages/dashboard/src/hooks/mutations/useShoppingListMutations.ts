@@ -9,6 +9,7 @@ export function useAddItem() {
     mutationFn: async (data: {
       householdId: string;
       name: string;
+      brand?: string | null;
       productId?: string;
       barcode?: string | null;
       quantity?: number | null;

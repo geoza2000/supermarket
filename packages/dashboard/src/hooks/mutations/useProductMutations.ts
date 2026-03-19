@@ -7,6 +7,7 @@ export function useUpdateProduct() {
       householdId: string;
       productId: string;
       name?: string;
+      brand?: string | null;
       barcode?: string | null;
       shopId?: string | null;
       category?: string | null;

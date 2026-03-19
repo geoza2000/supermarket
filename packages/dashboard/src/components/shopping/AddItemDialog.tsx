@@ -73,6 +73,7 @@ export function AddItemDialog({
   const addItemMutation = useAddItem();
 
   const [name, setName] = useState('');
+  const [brand, setBrand] = useState('');
   const [quantity, setQuantity] = useState('');
   const [unit, setUnit] = useState('');
   const [shopId, setShopId] = useState<string>('');
@@ -91,6 +92,7 @@ export function AddItemDialog({
     const localMatch = products.find((p) => p.barcode === scannedBarcode);
     if (localMatch) {
       setName(localMatch.name);
+      setBrand(localMatch.brand ?? '');
       setMatchedProduct(localMatch);
       if (localMatch.defaultQuantity) setQuantity(String(localMatch.defaultQuantity));
       if (localMatch.unit) setUnit(localMatch.unit);
@@ -105,6 +107,7 @@ export function AddItemDialog({
       .then((result) => {
         if (result.found) {
           if (result.name) setName(result.name);
+          if (result.brand) setBrand(result.brand);
           if (result.category) setCategory(result.category);
           if (result.quantity) {
             const parsed = parseQuantityString(result.quantity);
@@ -136,6 +139,7 @@ export function AddItemDialog({
 
   const handleSelectProduct = (product: ProductDocument) => {
     setName(product.name);
+    setBrand(product.brand ?? '');
     setMatchedProduct(product);
     if (product.defaultQuantity) setQuantity(String(product.defaultQuantity));
     if (product.unit) setUnit(product.unit);
@@ -146,6 +150,7 @@ export function AddItemDialog({
 
   const resetForm = () => {
     setName('');
+    setBrand('');
     setQuantity('');
     setUnit('');
     setShopId('');
@@ -165,6 +170,7 @@ export function AddItemDialog({
       await addItemMutation.mutateAsync({
         householdId,
         name: name.trim(),
+        brand: brand.trim() || null,
         ...(matchedProduct?.productId && { productId: matchedProduct.productId }),
         barcode: barcode || null,
         quantity: quantity ? Number(quantity) : null,
@@ -258,6 +264,11 @@ export function AddItemDialog({
                         onClick={() => handleSelectProduct(product)}
                       >
                         <span className="font-medium">{product.name}</span>
+                        {product.brand && (
+                          <span className="text-muted-foreground ml-1">
+                            — {product.brand}
+                          </span>
+                        )}
                         {product.category && (
                           <span className="text-muted-foreground ml-2">
                             {product.category}
@@ -279,6 +290,16 @@ export function AddItemDialog({
                 </Button>
               )}
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="item-brand">Brand (optional)</Label>
+            <Input
+              id="item-brand"
+              placeholder="e.g. Nestlé, Heinz..."
+              value={brand}
+              onChange={(e) => setBrand(e.target.value)}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-3">

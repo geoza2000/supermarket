@@ -39,6 +39,7 @@ export function EditProductDialog({
   const updateMutation = useUpdateProduct();
 
   const [editName, setEditName] = useState('');
+  const [editBrand, setEditBrand] = useState('');
   const [editBarcode, setEditBarcode] = useState('');
   const [editCategory, setEditCategory] = useState('');
   const [editQuantity, setEditQuantity] = useState('');
@@ -48,6 +49,7 @@ export function EditProductDialog({
   useEffect(() => {
     if (product && open) {
       setEditName(product.name);
+      setEditBrand(product.brand ?? '');
       setEditBarcode(product.barcode ?? '');
       setEditCategory(product.category ?? '');
       setEditQuantity(product.defaultQuantity != null ? String(product.defaultQuantity) : '');
@@ -66,6 +68,7 @@ export function EditProductDialog({
         householdId,
         productId: product.productId,
         name: editName.trim(),
+        brand: editBrand.trim() || null,
         barcode: editBarcode.trim() || null,
         category: editCategory.trim() || null,
         defaultQuantity: editQuantity ? Number(editQuantity) : null,
@@ -92,6 +95,16 @@ export function EditProductDialog({
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
               autoFocus
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="prod-brand">Brand (optional)</Label>
+            <Input
+              id="prod-brand"
+              value={editBrand}
+              onChange={(e) => setEditBrand(e.target.value)}
+              placeholder="e.g. Nestlé, Heinz..."
             />
           </div>
 

@@ -37,6 +37,7 @@ export function ProductsPage() {
     return products.filter(
       (p) =>
         p.name.toLowerCase().includes(q) ||
+        p.brand?.toLowerCase().includes(q) ||
         p.barcode?.toLowerCase().includes(q) ||
         p.category?.toLowerCase().includes(q)
     );
@@ -74,7 +75,7 @@ export function ProductsPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             className="pl-9"
-            placeholder="Search products by name, barcode, or category..."
+            placeholder="Search by name, brand, barcode, or category..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -119,6 +120,11 @@ export function ProductsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="font-medium truncate">{product.name}</span>
+                      {product.brand && (
+                        <span className="text-sm text-muted-foreground truncate">
+                          {product.brand}
+                        </span>
+                      )}
                       {qty && (
                         <span className="text-sm text-muted-foreground shrink-0">
                           {qty}

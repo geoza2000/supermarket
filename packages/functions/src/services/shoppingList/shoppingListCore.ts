@@ -59,6 +59,7 @@ export async function addItem(
       const newProduct = await createProduct({
         householdId: input.householdId,
         name: input.name,
+        brand: input.brand ?? null,
         barcode: input.barcode ?? null,
         shopId,
         category,
