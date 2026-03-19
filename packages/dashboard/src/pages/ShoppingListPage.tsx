@@ -211,7 +211,6 @@ export function ShoppingListPage() {
                   shopId={isUnassigned ? null : key}
                   shopName={isUnassigned ? 'Unassigned' : (shopMap[key]?.name ?? key)}
                   items={allItems}
-                  shopMap={shopMap}
                   onComplete={handleComplete}
                   onUncomplete={handleUncomplete}
                   onEdit={handleEdit}
@@ -235,7 +234,6 @@ export function ShoppingListPage() {
                   const key = i.shopId || '__unassigned__';
                   return !itemsByShop[key];
                 })}
-                shopMap={shopMap}
                 onComplete={handleComplete}
                 onUncomplete={handleUncomplete}
                 onEdit={handleEdit}

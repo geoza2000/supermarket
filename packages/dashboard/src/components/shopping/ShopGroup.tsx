@@ -4,13 +4,12 @@ import { Badge } from '@/components/ui/badge';
 import { CloseSessionDialog } from './CloseSessionDialog';
 import { ShoppingItemRow } from './ShoppingItemRow';
 import { CheckCircle2 } from 'lucide-react';
-import type { ShoppingItemDocument, ShopDocument } from '@supermarket-list/shared';
+import type { ShoppingItemDocument } from '@supermarket-list/shared';
 
 interface ShopGroupProps {
   shopId: string | null;
   shopName: string;
   items: ShoppingItemDocument[];
-  shopMap: Record<string, ShopDocument>;
   onComplete: (itemId: string) => void;
   onUncomplete: (itemId: string) => void;
   onEdit: (item: ShoppingItemDocument) => void;
@@ -23,7 +22,6 @@ export function ShopGroup({
   shopId,
   shopName,
   items,
-  shopMap,
   onComplete,
   onUncomplete,
   onEdit,
@@ -63,7 +61,6 @@ export function ShopGroup({
           <ShoppingItemRow
             key={item.itemId}
             item={item}
-            shopMap={shopMap}
             onComplete={onComplete}
             onUncomplete={onUncomplete}
             onEdit={onEdit}

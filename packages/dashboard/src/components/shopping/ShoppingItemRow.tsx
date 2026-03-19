@@ -1,11 +1,9 @@
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Loader2, Pencil, Check, Minus, Plus } from 'lucide-react';
-import type { ShoppingItemDocument, ShopDocument } from '@supermarket-list/shared';
+import type { ShoppingItemDocument } from '@supermarket-list/shared';
 
 interface ShoppingItemRowProps {
   item: ShoppingItemDocument;
-  shopMap: Record<string, ShopDocument>;
   onComplete: (itemId: string) => void;
   onUncomplete: (itemId: string) => void;
   onEdit: (item: ShoppingItemDocument) => void;
@@ -15,15 +13,12 @@ interface ShoppingItemRowProps {
 
 export function ShoppingItemRow({
   item,
-  shopMap,
   onComplete,
   onUncomplete,
   onEdit,
   onUpdateQuantity,
   isToggling,
 }: ShoppingItemRowProps) {
-  const shop = item.shopId ? shopMap[item.shopId] : null;
-
   const quantityLabel = [
     item.quantity != null ? String(item.quantity) : null,
     item.unit,
@@ -82,13 +77,6 @@ export function ShoppingItemRow({
           <span className="text-xs text-muted-foreground truncate">
             {item.brand}
           </span>
-        )}
-        {shop && (
-          <div className="flex items-center gap-1.5 mt-0.5">
-            <Badge variant="outline" className="text-xs">
-              {shop.name}
-            </Badge>
-          </div>
         )}
       </button>
 
