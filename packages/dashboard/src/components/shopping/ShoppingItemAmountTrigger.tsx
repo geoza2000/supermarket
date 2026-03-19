@@ -14,7 +14,7 @@ export interface ShoppingItemAmountTriggerProps {
   unit?: string | null;
   disabled?: boolean;
   onOpenDialog: () => void;
-  onAdjustQuantity: (next: number) => void;
+  onAdjustQuantity: (next: number) => void | Promise<void>;
   className?: string;
 }
 

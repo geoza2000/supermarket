@@ -13,7 +13,7 @@ interface ShopGroupProps {
   onComplete: (itemId: string) => void;
   onUncomplete: (itemId: string) => void;
   onEdit: (item: ShoppingItemDocument) => void;
-  onUpdateQuantity: (itemId: string, quantity: number) => void;
+  onUpdateQuantity: (itemId: string, quantity: number) => Promise<void>;
   onCloseSession: (shopId: string | null) => Promise<void>;
   togglingItemId: string | null;
   disabled?: boolean;

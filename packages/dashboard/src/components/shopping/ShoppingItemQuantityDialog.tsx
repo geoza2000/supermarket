@@ -24,7 +24,7 @@ export interface ShoppingItemQuantityDialogProps {
   /** Current saved quantity; used when opening and to detect changes on close */
   quantity: number;
   disabled?: boolean;
-  onSave: (nextQuantity: number) => void;
+  onSave: (nextQuantity: number) => void | Promise<void>;
 }
 
 export function ShoppingItemQuantityDialog({

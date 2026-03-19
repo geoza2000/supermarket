@@ -1,7 +1,8 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2, Pencil, Check } from 'lucide-react';
 import type { ShoppingItemDocument } from '@supermarket-list/shared';
+import { toast } from '@/hooks/useToast';
 import { ShoppingItemAmountTrigger } from './ShoppingItemAmountTrigger';
 import { ShoppingItemQuantityDialog } from './ShoppingItemQuantityDialog';
 
@@ -10,7 +11,7 @@ interface ShoppingItemRowProps {
   onComplete: (itemId: string) => void;
   onUncomplete: (itemId: string) => void;
   onEdit: (item: ShoppingItemDocument) => void;
-  onUpdateQuantity: (itemId: string, quantity: number) => void;
+  onUpdateQuantity: (itemId: string, quantity: number) => Promise<void>;
   isToggling?: boolean;
   disabled?: boolean;
 }
@@ -25,9 +26,42 @@ export function ShoppingItemRow({
   disabled,
 }: ShoppingItemRowProps) {
   const [qtyEditorOpen, setQtyEditorOpen] = useState(false);
+  const [optimisticQty, setOptimisticQty] = useState<number | null>(null);
+  const commitGenRef = useRef(0);
+
+  useEffect(() => {
+    setOptimisticQty(null);
+  }, [item.itemId]);
+
+  const serverQty = item.quantity ?? 1;
+  const displayQty = optimisticQty ?? serverQty;
+
+  useEffect(() => {
+    if (optimisticQty === null) return;
+    if (serverQty === optimisticQty) {
+      setOptimisticQty(null);
+    }
+  }, [serverQty, optimisticQty]);
 
   const commitQuantity = useCallback(
-    (q: number) => onUpdateQuantity(item.itemId, q),
+    async (q: number) => {
+      const gen = ++commitGenRef.current;
+      setOptimisticQty(q);
+      try {
+        await onUpdateQuantity(item.itemId, q);
+      } catch (err) {
+        if (commitGenRef.current !== gen) return;
+        setOptimisticQty(null);
+        toast({
+          title: 'Failed to update quantity',
+          description:
+            err instanceof Error
+              ? err.message
+              : 'Could not save your change. Check your connection and try again.',
+          variant: 'destructive',
+        });
+      }
+    },
     [item.itemId, onUpdateQuantity]
   );
 
@@ -95,11 +129,13 @@ export function ShoppingItemRow({
       {!item.completed && (
         <>
           <ShoppingItemAmountTrigger
-            quantity={item.quantity ?? 1}
+            quantity={displayQty}
             unit={item.unit}
             disabled={disabled}
             onOpenDialog={() => setQtyEditorOpen(true)}
-            onAdjustQuantity={commitQuantity}
+            onAdjustQuantity={(next) => {
+              void commitQuantity(next);
+            }}
           />
 
           <ShoppingItemQuantityDialog
@@ -107,9 +143,11 @@ export function ShoppingItemRow({
             onOpenChange={setQtyEditorOpen}
             itemName={item.name}
             unit={item.unit}
-            quantity={item.quantity ?? 1}
+            quantity={displayQty}
             disabled={disabled}
-            onSave={commitQuantity}
+            onSave={(q) => {
+              void commitQuantity(q);
+            }}
           />
         </>
       )}

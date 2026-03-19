@@ -95,12 +95,10 @@ export function ShoppingListPage() {
 
   const handleUpdateQuantity = useCallback(
     async (itemId: string, quantity: number) => {
-      if (!householdId) return;
-      try {
-        await updateItemMutation.mutateAsync({ householdId, itemId, quantity });
-      } catch {
-        toast({ title: 'Failed to update quantity', variant: 'destructive' });
+      if (!householdId) {
+        throw new Error('No household');
       }
+      await updateItemMutation.mutateAsync({ householdId, itemId, quantity });
     },
     [householdId, updateItemMutation]
   );
