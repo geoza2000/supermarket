@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CloseSessionDialog } from './CloseSessionDialog';
 import { ShoppingItemRow } from './ShoppingItemRow';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, ChevronDown, ChevronRight } from 'lucide-react';
 import type { ShoppingItemDocument } from '@supermarket-list/shared';
 
 interface ShopGroupProps {
@@ -32,24 +32,36 @@ export function ShopGroup({
   disabled,
 }: ShopGroupProps) {
   const [showConfirm, setShowConfirm] = useState(false);
+  const [expanded, setExpanded] = useState(true);
 
   const completedCount = items.filter((i) => i.completed).length;
   const pendingCount = items.filter((i) => !i.completed).length;
 
   return (
     <div className="border rounded-lg overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-3 bg-muted/50">
-        <div className="flex items-center gap-2">
-          <h3 className="font-semibold text-sm">{shopName}</h3>
-          <Badge variant="secondary" className="text-xs">
+      <div className="flex items-center justify-between gap-2 px-4 py-3 bg-muted/50">
+        <button
+          type="button"
+          className="flex min-w-0 flex-1 items-center gap-2 rounded-md py-1 text-left -my-1 -ml-1 pl-1 transition-colors hover:bg-muted/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          onClick={() => setExpanded((e) => !e)}
+          aria-expanded={expanded}
+          aria-label={expanded ? `Collapse ${shopName}` : `Expand ${shopName}`}
+        >
+          {expanded ? (
+            <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+          ) : (
+            <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+          )}
+          <span className="truncate font-semibold text-sm">{shopName}</span>
+          <Badge variant="secondary" className="shrink-0 text-xs">
             {pendingCount} left
           </Badge>
-        </div>
+        </button>
         {completedCount > 0 && (
           <Button
             variant="ghost"
             size="sm"
-            className="text-xs h-7"
+            className="shrink-0 text-xs h-7"
             onClick={() => setShowConfirm(true)}
             disabled={disabled}
           >
@@ -59,20 +71,22 @@ export function ShopGroup({
         )}
       </div>
 
-      <div className="divide-y">
-        {items.map((item) => (
-          <ShoppingItemRow
-            key={item.itemId}
-            item={item}
-            onComplete={onComplete}
-            onUncomplete={onUncomplete}
-            onEdit={onEdit}
-            onUpdateQuantity={onUpdateQuantity}
-            isToggling={togglingItemId === item.itemId}
-            disabled={disabled}
-          />
-        ))}
-      </div>
+      {expanded && (
+        <div className="divide-y">
+          {items.map((item) => (
+            <ShoppingItemRow
+              key={item.itemId}
+              item={item}
+              onComplete={onComplete}
+              onUncomplete={onUncomplete}
+              onEdit={onEdit}
+              onUpdateQuantity={onUpdateQuantity}
+              isToggling={togglingItemId === item.itemId}
+              disabled={disabled}
+            />
+          ))}
+        </div>
+      )}
 
       <CloseSessionDialog
         open={showConfirm}
