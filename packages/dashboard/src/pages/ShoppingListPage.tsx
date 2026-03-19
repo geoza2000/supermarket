@@ -232,6 +232,8 @@ export function ShoppingListPage() {
               return (
                 <ShopGroup
                   key={key}
+                  householdId={householdId}
+                  sectionKey={key}
                   shopId={isUnassigned ? null : key}
                   shopName={isUnassigned ? 'Unassigned' : (shopMap[key]?.name ?? key)}
                   items={allItems}
@@ -253,6 +255,8 @@ export function ShoppingListPage() {
               })
               .length > 0 && (
               <ShopGroup
+                householdId={householdId}
+                sectionKey="__completed_only__"
                 shopId={null}
                 shopName="Completed"
                 items={completedItems.filter((i) => {

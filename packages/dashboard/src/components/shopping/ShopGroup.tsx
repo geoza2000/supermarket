@@ -1,12 +1,16 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { readShopGroupExpanded, writeShopGroupExpanded } from '@/lib/shopGroupExpandedStorage';
 import { CloseSessionDialog } from './CloseSessionDialog';
 import { ShoppingItemRow } from './ShoppingItemRow';
 import { CheckCircle2, ChevronDown, ChevronRight } from 'lucide-react';
 import type { ShoppingItemDocument } from '@supermarket-list/shared';
 
 interface ShopGroupProps {
+  householdId: string | null;
+  /** Stable id for this block (e.g. shop id, __unassigned__, or a sentinel for "Completed-only"). */
+  sectionKey: string;
   shopId: string | null;
   shopName: string;
   items: ShoppingItemDocument[];
@@ -20,6 +24,8 @@ interface ShopGroupProps {
 }
 
 export function ShopGroup({
+  householdId,
+  sectionKey,
   shopId,
   shopName,
   items,
@@ -32,7 +38,14 @@ export function ShopGroup({
   disabled,
 }: ShopGroupProps) {
   const [showConfirm, setShowConfirm] = useState(false);
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(() =>
+    householdId ? readShopGroupExpanded(householdId, sectionKey) : true
+  );
+
+  useEffect(() => {
+    if (!householdId) return;
+    setExpanded(readShopGroupExpanded(householdId, sectionKey));
+  }, [householdId, sectionKey]);
 
   const completedCount = items.filter((i) => i.completed).length;
   const pendingCount = items.filter((i) => !i.completed).length;
@@ -43,7 +56,13 @@ export function ShopGroup({
         <button
           type="button"
           className="flex min-w-0 flex-1 items-center gap-2 rounded-md py-1 text-left -my-1 -ml-1 pl-1 transition-colors hover:bg-muted/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          onClick={() => setExpanded((e) => !e)}
+          onClick={() =>
+            setExpanded((e) => {
+              const next = !e;
+              if (householdId) writeShopGroupExpanded(householdId, sectionKey, next);
+              return next;
+            })
+          }
           aria-expanded={expanded}
           aria-label={expanded ? `Collapse ${shopName}` : `Expand ${shopName}`}
         >
