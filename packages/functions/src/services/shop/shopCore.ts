@@ -9,6 +9,8 @@ import type {
 import { shopToDocument, documentToShop } from '@supermarket-list/shared';
 import { HOUSEHOLDS_COLLECTION } from '../household/constants';
 import { SHOPS_SUBCOLLECTION } from './constants';
+import { ITEMS_SUBCOLLECTION } from '../shoppingList/constants';
+import { PRODUCTS_SUBCOLLECTION } from '../product/constants';
 
 function shopsCollection(householdId: string) {
   return db
@@ -67,7 +69,32 @@ export async function deleteShop(
   householdId: string,
   shopId: string
 ): Promise<void> {
-  await shopsCollection(householdId).doc(shopId).delete();
+  const householdRef = db.collection(HOUSEHOLDS_COLLECTION).doc(householdId);
+
+  const [itemsSnapshot, productsSnapshot] = await Promise.all([
+    householdRef
+      .collection(ITEMS_SUBCOLLECTION)
+      .where('shopId', '==', shopId)
+      .get(),
+    householdRef
+      .collection(PRODUCTS_SUBCOLLECTION)
+      .where('shopId', '==', shopId)
+      .get(),
+  ]);
+
+  const batch = db.batch();
+
+  const now = new Date().toISOString();
+  for (const doc of itemsSnapshot.docs) {
+    batch.update(doc.ref, { shopId: null, updatedAt: now });
+  }
+  for (const doc of productsSnapshot.docs) {
+    batch.update(doc.ref, { shopId: null, updatedAt: now });
+  }
+
+  batch.delete(shopsCollection(householdId).doc(shopId));
+
+  await batch.commit();
 }
 
 export async function updateShopLastVisited(
