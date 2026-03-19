@@ -4,6 +4,12 @@ import {
   callCloseShoppingSession,
 } from '@/lib/firebase';
 
+function assertOnline() {
+  if (!navigator.onLine) {
+    throw new Error('You are offline. Please reconnect to make changes.');
+  }
+}
+
 export function useAddItem() {
   return useMutation({
     mutationFn: async (data: {
@@ -16,6 +22,7 @@ export function useAddItem() {
       unit?: string | null;
       shopId?: string | null;
     }) => {
+      assertOnline();
       const result = await callManageShoppingItem({
         action: 'add',
         data,
@@ -35,6 +42,7 @@ export function useUpdateItem() {
       unit?: string | null;
       shopId?: string | null;
     }) => {
+      assertOnline();
       const result = await callManageShoppingItem({
         action: 'update',
         data,
@@ -47,6 +55,7 @@ export function useUpdateItem() {
 export function useCompleteItem() {
   return useMutation({
     mutationFn: async ({ householdId, itemId }: { householdId: string; itemId: string }) => {
+      assertOnline();
       const result = await callManageShoppingItem({
         action: 'complete',
         data: { householdId, itemId },
@@ -59,6 +68,7 @@ export function useCompleteItem() {
 export function useUncompleteItem() {
   return useMutation({
     mutationFn: async ({ householdId, itemId }: { householdId: string; itemId: string }) => {
+      assertOnline();
       const result = await callManageShoppingItem({
         action: 'uncomplete',
         data: { householdId, itemId },
@@ -71,6 +81,7 @@ export function useUncompleteItem() {
 export function useRemoveItem() {
   return useMutation({
     mutationFn: async ({ householdId, itemId }: { householdId: string; itemId: string }) => {
+      assertOnline();
       const result = await callManageShoppingItem({
         action: 'remove',
         data: { householdId, itemId },
@@ -91,6 +102,7 @@ export function useCloseShoppingSession() {
       shopId?: string | null;
       closeAll?: boolean;
     }) => {
+      assertOnline();
       const result = await callCloseShoppingSession({
         householdId,
         shopId,

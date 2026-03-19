@@ -16,6 +16,7 @@ interface ShopGroupProps {
   onUpdateQuantity: (itemId: string, quantity: number) => void;
   onCloseSession: (shopId: string | null) => Promise<void>;
   togglingItemId: string | null;
+  disabled?: boolean;
 }
 
 export function ShopGroup({
@@ -28,6 +29,7 @@ export function ShopGroup({
   onUpdateQuantity,
   onCloseSession,
   togglingItemId,
+  disabled,
 }: ShopGroupProps) {
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -49,6 +51,7 @@ export function ShopGroup({
             size="sm"
             className="text-xs h-7"
             onClick={() => setShowConfirm(true)}
+            disabled={disabled}
           >
             <CheckCircle2 className="mr-1 h-3.5 w-3.5" />
             Done Shopping
@@ -66,6 +69,7 @@ export function ShopGroup({
             onEdit={onEdit}
             onUpdateQuantity={onUpdateQuantity}
             isToggling={togglingItemId === item.itemId}
+            disabled={disabled}
           />
         ))}
       </div>

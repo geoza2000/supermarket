@@ -13,6 +13,7 @@ import { HouseholdSettingsPage } from '@/pages/HouseholdSettingsPage';
 import { Toaster } from '@/components/ui/toaster';
 import { FcmTokenSync, NotificationListener, NotificationPrompt } from '@/components/notifications';
 import { ProtectedRoute, HouseholdGuard } from '@/components/guards';
+import { OfflineBanner } from '@/components/OfflineBanner';
 
 function AppRoutes() {
   return (
@@ -96,6 +97,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <OfflineBanner />
         <AppRoutes />
         <Toaster />
         <NotificationPrompt />

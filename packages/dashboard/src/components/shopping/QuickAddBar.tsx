@@ -13,6 +13,7 @@ interface QuickAddBarProps {
   currentItems: ShoppingItemDocument[];
   onScanBarcode: () => void;
   onOpenFullForm: (prefillName?: string) => void;
+  disabled?: boolean;
 }
 
 const MAX_CHIPS = 30;
@@ -24,6 +25,7 @@ export function QuickAddBar({
   currentItems,
   onScanBarcode,
   onOpenFullForm,
+  disabled,
 }: QuickAddBarProps) {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -193,9 +195,9 @@ export function QuickAddBar({
                 <button
                   key={product.productId}
                   type="button"
-                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs bg-secondary hover:bg-secondary/80 rounded-full transition-colors active:scale-95 whitespace-nowrap"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs bg-secondary hover:bg-secondary/80 rounded-full transition-colors active:scale-95 whitespace-nowrap disabled:opacity-40"
                   onClick={() => handleQuickAdd(product)}
-                  disabled={addItemMutation.isPending}
+                  disabled={addItemMutation.isPending || disabled}
                 >
                   <Plus className="h-3 w-3 opacity-50" />
                   {product.name}
@@ -213,11 +215,12 @@ export function QuickAddBar({
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
             <Input
               ref={inputRef}
-              placeholder="Add an item..."
+              placeholder={disabled ? 'Offline — read only' : 'Add an item...'}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onFocus={() => setIsFocused(true)}
               className="pl-9 pr-3"
+              disabled={disabled}
             />
           </div>
           {query.trim() ? (
@@ -225,7 +228,7 @@ export function QuickAddBar({
               type="submit"
               size="icon"
               variant="default"
-              disabled={addItemMutation.isPending}
+              disabled={addItemMutation.isPending || disabled}
             >
               {addItemMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -239,6 +242,7 @@ export function QuickAddBar({
               size="icon"
               variant="outline"
               onClick={onScanBarcode}
+              disabled={disabled}
             >
               <Camera className="h-4 w-4" />
             </Button>

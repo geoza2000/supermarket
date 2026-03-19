@@ -9,6 +9,7 @@ interface ShoppingItemRowProps {
   onEdit: (item: ShoppingItemDocument) => void;
   onUpdateQuantity: (itemId: string, quantity: number) => void;
   isToggling?: boolean;
+  disabled?: boolean;
 }
 
 export function ShoppingItemRow({
@@ -18,6 +19,7 @@ export function ShoppingItemRow({
   onEdit,
   onUpdateQuantity,
   isToggling,
+  disabled,
 }: ShoppingItemRowProps) {
   const quantityLabel = [
     item.quantity != null ? String(item.quantity) : null,
@@ -27,18 +29,18 @@ export function ShoppingItemRow({
     .join(' ');
 
   const handleToggle = () => {
-    if (isToggling) return;
+    if (isToggling || disabled) return;
     item.completed ? onUncomplete(item.itemId) : onComplete(item.itemId);
   };
 
   return (
     <div className="flex items-center min-h-[56px] py-2 pl-4 pr-3 gap-2">
       {/* Checkbox */}
-      <button
+        <button
         type="button"
         className="shrink-0 active:scale-95 transition-transform"
         onClick={handleToggle}
-        disabled={isToggling}
+        disabled={isToggling || disabled}
       >
         <div
           className="flex items-center justify-center h-7 w-7 rounded-full border-2 border-primary/40 transition-colors data-[checked=true]:bg-primary data-[checked=true]:border-primary"
@@ -53,11 +55,11 @@ export function ShoppingItemRow({
       </button>
 
       {/* Name + badges — tapping also toggles completion */}
-      <button
+        <button
         type="button"
         className="flex-1 min-w-0 text-left active:opacity-70 transition-opacity"
         onClick={handleToggle}
-        disabled={isToggling}
+        disabled={isToggling || disabled}
       >
         <div className="flex items-center gap-2">
           <span
@@ -86,7 +88,7 @@ export function ShoppingItemRow({
           <button
             type="button"
             className="inline-flex items-center justify-center h-8 w-8 rounded-md border border-input bg-background active:bg-accent disabled:opacity-40"
-            disabled={(item.quantity ?? 1) <= 1}
+            disabled={(item.quantity ?? 1) <= 1 || disabled}
             onClick={() => {
               const current = item.quantity ?? 1;
               if (current > 1) onUpdateQuantity(item.itemId, current - 1);
@@ -99,7 +101,8 @@ export function ShoppingItemRow({
           </span>
           <button
             type="button"
-            className="inline-flex items-center justify-center h-8 w-8 rounded-md border border-input bg-background active:bg-accent"
+            className="inline-flex items-center justify-center h-8 w-8 rounded-md border border-input bg-background active:bg-accent disabled:opacity-40"
+            disabled={disabled}
             onClick={() => onUpdateQuantity(item.itemId, (item.quantity ?? 1) + 1)}
           >
             <Plus className="h-4 w-4" />
@@ -113,6 +116,7 @@ export function ShoppingItemRow({
         size="icon"
         className="h-9 w-9 shrink-0"
         onClick={() => onEdit(item)}
+        disabled={disabled}
       >
         <Pencil className="h-4 w-4 text-muted-foreground" />
       </Button>

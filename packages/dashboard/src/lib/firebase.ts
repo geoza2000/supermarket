@@ -1,5 +1,13 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
-import { getFirestore, Firestore, connectFirestoreEmulator, doc, getDoc } from 'firebase/firestore';
+import {
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+  Firestore,
+  connectFirestoreEmulator,
+  doc,
+  getDoc,
+} from 'firebase/firestore';
 import { getAuth, Auth, GoogleAuthProvider } from 'firebase/auth';
 import { getFunctions, Functions, httpsCallable, connectFunctionsEmulator } from 'firebase/functions';
 import { getMessaging, Messaging, getToken, onMessage } from 'firebase/messaging';
@@ -36,7 +44,11 @@ if (getApps().length === 0) {
   app = getApps()[0];
 }
 
-db = getFirestore(app);
+db = initializeFirestore(app, {
+  localCache: persistentLocalCache({
+    tabManager: persistentMultipleTabManager(),
+  }),
+});
 auth = getAuth(app);
 functions = getFunctions(app, 'us-central1');
 

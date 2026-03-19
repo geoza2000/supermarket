@@ -1,5 +1,6 @@
 // UI hooks
 export { useToast, toast } from './useToast';
+export { useOnlineStatus } from './useOnlineStatus';
 
 // Feature hooks
 export { useNotifications } from './useNotifications';

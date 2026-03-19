@@ -4,6 +4,7 @@ import { useHouseholdStore } from '@/stores';
 import { useShoppingList } from '@/hooks/useShoppingList';
 import { useProducts } from '@/hooks/useProducts';
 import { useShops } from '@/hooks/useShops';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import {
   useAddItem,
   useUpdateItem,
@@ -38,6 +39,8 @@ export function ShoppingListPage() {
   const navigate = useNavigate();
   const activeHousehold = useHouseholdStore((s) => s.activeHousehold);
   const householdId = activeHousehold?.householdId ?? null;
+
+  const isOnline = useOnlineStatus();
 
   const { items, pendingItems, completedItems, itemsByShop, loading } =
     useShoppingList(householdId);
@@ -156,6 +159,7 @@ export function ShoppingListPage() {
                 size="sm"
                 className="text-xs text-primary-foreground hover:bg-white/15 hover:text-primary-foreground"
                 onClick={() => setShowCloseAll(true)}
+                disabled={!isOnline}
               >
                 <CheckCircle2 className="mr-1 h-3.5 w-3.5" />
                 Close All
@@ -189,11 +193,11 @@ export function ShoppingListPage() {
               Scan a barcode or type manually to add items
             </p>
             <div className="flex gap-3">
-              <Button onClick={() => setScannerOpen(true)}>
+              <Button onClick={() => setScannerOpen(true)} disabled={!isOnline}>
                 <Camera className="mr-2 h-4 w-4" />
                 Scan Barcode
               </Button>
-              <Button variant="outline" onClick={() => setAddDialogOpen(true)}>
+              <Button variant="outline" onClick={() => setAddDialogOpen(true)} disabled={!isOnline}>
                 <Plus className="mr-2 h-4 w-4" />
                 Add Manually
               </Button>
@@ -225,6 +229,7 @@ export function ShoppingListPage() {
                   onUpdateQuantity={handleUpdateQuantity}
                   onCloseSession={handleCloseSession}
                   togglingItemId={togglingItemId}
+                  disabled={!isOnline}
                 />
               );
             })}
@@ -248,6 +253,7 @@ export function ShoppingListPage() {
                 onUpdateQuantity={handleUpdateQuantity}
                 onCloseSession={handleCloseSession}
                 togglingItemId={togglingItemId}
+                disabled={!isOnline}
               />
             )}
           </div>
@@ -265,6 +271,7 @@ export function ShoppingListPage() {
           currentItems={items}
           onScanBarcode={() => setScannerOpen(true)}
           onOpenFullForm={handleOpenFullForm}
+          disabled={!isOnline}
         />
       )}
 
