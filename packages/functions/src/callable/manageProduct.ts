@@ -36,7 +36,6 @@ export const manageProductFn = onCall(CALLABLE_CONFIG, async (request) => {
         name: product.name,
         barcode: product.barcode,
         shopId: product.shopId,
-        category: product.category,
         defaultQuantity: product.defaultQuantity,
         unit: product.unit,
         createdAt: product.createdAt.toISOString(),
@@ -45,10 +44,9 @@ export const manageProductFn = onCall(CALLABLE_CONFIG, async (request) => {
     case 'update': {
       await updateProduct(data);
 
-      const configUpdates: { name?: string; shopId?: string | null; category?: string | null } = {};
+      const configUpdates: { name?: string; shopId?: string | null } = {};
       if (data.name !== undefined) configUpdates.name = data.name;
       if (data.shopId !== undefined) configUpdates.shopId = data.shopId;
-      if (data.category !== undefined) configUpdates.category = data.category;
 
       if (Object.keys(configUpdates).length > 0) {
         await updateItemsByProductId(householdId, data.productId, configUpdates);

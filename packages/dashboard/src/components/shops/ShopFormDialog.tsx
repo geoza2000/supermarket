@@ -82,6 +82,7 @@ export function ShopFormDialog({
                 <Input
                   id="visit-value"
                   type="number"
+                  inputMode="numeric"
                   min="1"
                   max="365"
                   value={form.visitPeriodValue}

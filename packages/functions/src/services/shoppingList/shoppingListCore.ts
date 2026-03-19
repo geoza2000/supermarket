@@ -36,7 +36,6 @@ export async function addItem(
   let productId = input.productId;
   let brand = input.brand ?? null;
   let shopId = input.shopId ?? null;
-  let category = input.category ?? null;
   let quantity = input.quantity ?? null;
   let unit = input.unit ?? null;
 
@@ -54,7 +53,6 @@ export async function addItem(
       productId = existingProduct.productId;
       brand = brand ?? existingProduct.brand;
       shopId = shopId ?? existingProduct.shopId;
-      category = category ?? existingProduct.category;
       quantity = quantity ?? existingProduct.defaultQuantity;
       unit = unit ?? existingProduct.unit;
     } else {
@@ -64,7 +62,6 @@ export async function addItem(
         brand: input.brand ?? null,
         barcode: input.barcode ?? null,
         shopId,
-        category,
         defaultQuantity: quantity,
         unit,
       });
@@ -83,7 +80,6 @@ export async function addItem(
     quantity,
     unit,
     shopId,
-    category,
     completed: false,
     completedBy: null,
     completedAt: null,
@@ -105,15 +101,13 @@ export async function updateItem(input: UpdateItemInput): Promise<void> {
   if (input.quantity !== undefined) updates.quantity = input.quantity;
   if (input.unit !== undefined) updates.unit = input.unit;
   if (input.shopId !== undefined) updates.shopId = input.shopId;
-  if (input.category !== undefined) updates.category = input.category;
 
   const itemRef = itemsCollection(input.householdId).doc(input.itemId);
   await itemRef.update(updates);
 
   const hasConfigChanges =
     input.name !== undefined ||
-    input.shopId !== undefined ||
-    input.category !== undefined;
+    input.shopId !== undefined;
 
   if (hasConfigChanges) {
     const itemDoc = await itemRef.get();
@@ -125,7 +119,6 @@ export async function updateItem(input: UpdateItemInput): Promise<void> {
       };
       if (input.name !== undefined) productUpdate.name = input.name;
       if (input.shopId !== undefined) productUpdate.shopId = input.shopId;
-      if (input.category !== undefined) productUpdate.category = input.category;
       await updateProduct(productUpdate);
     }
   }
@@ -167,7 +160,7 @@ export async function removeItem(
 export async function updateItemsByProductId(
   householdId: string,
   productId: string,
-  updates: { name?: string; shopId?: string | null; category?: string | null }
+  updates: { name?: string; shopId?: string | null }
 ): Promise<void> {
   const snapshot = await itemsCollection(householdId)
     .where('productId', '==', productId)
@@ -181,7 +174,6 @@ export async function updateItemsByProductId(
   const updateData: Record<string, unknown> = { updatedAt: now };
   if (updates.name !== undefined) updateData.name = updates.name;
   if (updates.shopId !== undefined) updateData.shopId = updates.shopId;
-  if (updates.category !== undefined) updateData.category = updates.category;
 
   for (const doc of snapshot.docs) {
     batch.update(doc.ref, updateData);

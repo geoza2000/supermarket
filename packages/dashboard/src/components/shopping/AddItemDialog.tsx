@@ -77,7 +77,6 @@ export function AddItemDialog({
   const [quantity, setQuantity] = useState('');
   const [unit, setUnit] = useState('');
   const [shopId, setShopId] = useState<string>('');
-  const [category, setCategory] = useState('');
   const [barcode, setBarcode] = useState('');
   const [matchedProduct, setMatchedProduct] = useState<ProductDocument | null>(null);
   const [lookingUp, setLookingUp] = useState(false);
@@ -97,7 +96,6 @@ export function AddItemDialog({
       if (localMatch.defaultQuantity) setQuantity(String(localMatch.defaultQuantity));
       if (localMatch.unit) setUnit(localMatch.unit);
       if (localMatch.shopId) setShopId(localMatch.shopId);
-      if (localMatch.category) setCategory(localMatch.category);
       setLookupDone(true);
       return;
     }
@@ -108,7 +106,6 @@ export function AddItemDialog({
         if (result.found) {
           if (result.name) setName(result.name);
           if (result.brand) setBrand(result.brand);
-          if (result.category) setCategory(result.category);
           if (result.quantity) {
             const parsed = parseQuantityString(result.quantity);
             if (parsed.amount) setQuantity(parsed.amount);
@@ -144,7 +141,6 @@ export function AddItemDialog({
     if (product.defaultQuantity) setQuantity(String(product.defaultQuantity));
     if (product.unit) setUnit(product.unit);
     if (product.shopId) setShopId(product.shopId);
-    if (product.category) setCategory(product.category);
     if (product.barcode) setBarcode(product.barcode);
   };
 
@@ -154,7 +150,6 @@ export function AddItemDialog({
     setQuantity('');
     setUnit('');
     setShopId('');
-    setCategory('');
     setBarcode('');
     setMatchedProduct(null);
     setLookupDone(false);
@@ -176,7 +171,6 @@ export function AddItemDialog({
         quantity: quantity ? Number(quantity) : null,
         unit: unit || null,
         shopId: resolvedShopId,
-        category: category.trim() || null,
       });
       resetForm();
       onOpenChange(false);
@@ -269,11 +263,6 @@ export function AddItemDialog({
                             — {product.brand}
                           </span>
                         )}
-                        {product.category && (
-                          <span className="text-muted-foreground ml-2">
-                            {product.category}
-                          </span>
-                        )}
                         {product.barcode && (
                           <Badge variant="outline" className="ml-2 text-xs">
                             {product.barcode}
@@ -308,6 +297,7 @@ export function AddItemDialog({
               <Input
                 id="quantity"
                 type="number"
+                inputMode="decimal"
                 step="any"
                 min="0"
                 placeholder="1"
@@ -350,16 +340,6 @@ export function AddItemDialog({
               </Select>
             </div>
           )}
-
-          <div className="space-y-2">
-            <Label htmlFor="category">Category (optional)</Label>
-            <Input
-              id="category"
-              placeholder="e.g. Dairy, Produce, Meat..."
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            />
-          </div>
 
           <Button
             type="submit"

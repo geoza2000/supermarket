@@ -297,7 +297,6 @@ export function ShoppingListPage() {
                 quantity: catalogMatch.defaultQuantity ?? null,
                 unit: catalogMatch.unit ?? null,
                 shopId: catalogMatch.shopId ?? null,
-                category: catalogMatch.category ?? null,
               });
               toast({ title: `${catalogMatch.name} added` });
             } catch {

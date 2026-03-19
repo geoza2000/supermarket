@@ -43,7 +43,6 @@ export function EditItemDialog({
   const [quantity, setQuantity] = useState('');
   const [unit, setUnit] = useState('');
   const [shopId, setShopId] = useState('');
-  const [category, setCategory] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
@@ -52,7 +51,6 @@ export function EditItemDialog({
       setQuantity(item.quantity != null ? String(item.quantity) : '');
       setUnit(item.unit ?? '');
       setShopId(item.shopId ?? '');
-      setCategory(item.category ?? '');
       setShowDeleteConfirm(false);
     }
   }, [item, open]);
@@ -70,7 +68,6 @@ export function EditItemDialog({
         quantity: quantity ? Number(quantity) : null,
         unit: unit || null,
         shopId: resolvedShopId,
-        category: category.trim() || null,
       });
       onOpenChange(false);
     } catch {
@@ -114,6 +111,7 @@ export function EditItemDialog({
               <Input
                 id="edit-quantity"
                 type="number"
+                inputMode="decimal"
                 step="any"
                 min="0"
                 placeholder="1"
@@ -156,16 +154,6 @@ export function EditItemDialog({
               </Select>
             </div>
           )}
-
-          <div className="space-y-2">
-            <Label htmlFor="edit-category">Category (optional)</Label>
-            <Input
-              id="edit-category"
-              placeholder="e.g. Dairy, Produce, Meat..."
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            />
-          </div>
 
           <div className="flex gap-3">
             <Button

@@ -9,7 +9,6 @@ export interface ShoppingItem {
   quantity: number | null;
   unit: string | null;
   shopId: string | null;
-  category: string | null;
   completed: boolean;
   completedBy: string | null;
   completedAt: Date | null;
@@ -27,7 +26,6 @@ export interface ShoppingItemDocument {
   quantity: number | null;
   unit: string | null;
   shopId: string | null;
-  category: string | null;
   completed: boolean;
   completedBy: string | null;
   completedAt: string | null;
@@ -47,7 +45,6 @@ export interface AddItemInput {
   quantity?: number | null;
   unit?: string | null;
   shopId?: string | null;
-  category?: string | null;
 }
 
 export interface CompleteItemInput {
@@ -67,7 +64,6 @@ export interface UpdateItemInput {
   quantity?: number | null;
   unit?: string | null;
   shopId?: string | null;
-  category?: string | null;
 }
 
 export interface RemoveItemInput {
@@ -103,7 +99,6 @@ export const AddItemSchema = z.object({
   quantity: z.number().positive().nullable().optional(),
   unit: z.string().max(20).nullable().optional(),
   shopId: z.string().nullable().optional(),
-  category: z.string().max(100).nullable().optional(),
 });
 
 export const CompleteItemSchema = z.object({
@@ -123,7 +118,6 @@ export const UpdateItemSchema = z.object({
   quantity: z.number().positive().nullable().optional(),
   unit: z.string().max(20).nullable().optional(),
   shopId: z.string().nullable().optional(),
-  category: z.string().max(100).nullable().optional(),
 });
 
 export const RemoveItemSchema = z.object({

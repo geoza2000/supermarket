@@ -15,7 +15,6 @@ export function useAddItem() {
       quantity?: number | null;
       unit?: string | null;
       shopId?: string | null;
-      category?: string | null;
     }) => {
       const result = await callManageShoppingItem({
         action: 'add',
@@ -35,7 +34,6 @@ export function useUpdateItem() {
       quantity?: number | null;
       unit?: string | null;
       shopId?: string | null;
-      category?: string | null;
     }) => {
       const result = await callManageShoppingItem({
         action: 'update',

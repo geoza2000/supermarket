@@ -41,7 +41,6 @@ export function EditProductDialog({
   const [editName, setEditName] = useState('');
   const [editBrand, setEditBrand] = useState('');
   const [editBarcode, setEditBarcode] = useState('');
-  const [editCategory, setEditCategory] = useState('');
   const [editQuantity, setEditQuantity] = useState('');
   const [editUnit, setEditUnit] = useState('');
   const [editShopId, setEditShopId] = useState('');
@@ -51,7 +50,6 @@ export function EditProductDialog({
       setEditName(product.name);
       setEditBrand(product.brand ?? '');
       setEditBarcode(product.barcode ?? '');
-      setEditCategory(product.category ?? '');
       setEditQuantity(product.defaultQuantity != null ? String(product.defaultQuantity) : '');
       setEditUnit(product.unit ?? '');
       setEditShopId(product.shopId ?? '');
@@ -70,7 +68,6 @@ export function EditProductDialog({
         name: editName.trim(),
         brand: editBrand.trim() || null,
         barcode: editBarcode.trim() || null,
-        category: editCategory.trim() || null,
         defaultQuantity: editQuantity ? Number(editQuantity) : null,
         unit: editUnit || null,
         shopId: resolvedShopId,
@@ -112,6 +109,7 @@ export function EditProductDialog({
             <Label htmlFor="prod-barcode">Barcode</Label>
             <Input
               id="prod-barcode"
+              inputMode="numeric"
               value={editBarcode}
               onChange={(e) => setEditBarcode(e.target.value)}
               placeholder="Optional"
@@ -124,6 +122,7 @@ export function EditProductDialog({
               <Input
                 id="prod-qty"
                 type="number"
+                inputMode="decimal"
                 step="any"
                 min="0"
                 placeholder="1"
@@ -166,16 +165,6 @@ export function EditProductDialog({
               </Select>
             </div>
           )}
-
-          <div className="space-y-2">
-            <Label htmlFor="prod-category">Category</Label>
-            <Input
-              id="prod-category"
-              placeholder="e.g. Dairy, Produce, Meat..."
-              value={editCategory}
-              onChange={(e) => setEditCategory(e.target.value)}
-            />
-          </div>
 
           <Button
             type="submit"

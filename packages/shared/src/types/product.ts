@@ -7,7 +7,6 @@ export interface Product {
   brand: string | null;
   barcode: string | null;
   shopId: string | null;
-  category: string | null;
   defaultQuantity: number | null;
   unit: string | null;
   createdAt: Date;
@@ -21,7 +20,6 @@ export interface ProductDocument {
   brand: string | null;
   barcode: string | null;
   shopId: string | null;
-  category: string | null;
   defaultQuantity: number | null;
   unit: string | null;
   createdAt: string;
@@ -36,7 +34,6 @@ export interface CreateProductInput {
   brand?: string | null;
   barcode?: string | null;
   shopId?: string | null;
-  category?: string | null;
   defaultQuantity?: number | null;
   unit?: string | null;
 }
@@ -48,7 +45,6 @@ export interface UpdateProductInput {
   brand?: string | null;
   barcode?: string | null;
   shopId?: string | null;
-  category?: string | null;
   defaultQuantity?: number | null;
   unit?: string | null;
 }
@@ -69,7 +65,6 @@ export const CreateProductSchema = z.object({
   brand: z.string().max(200).nullable().optional(),
   barcode: z.string().max(50).nullable().optional(),
   shopId: z.string().nullable().optional(),
-  category: z.string().max(100).nullable().optional(),
   defaultQuantity: z.number().positive().nullable().optional(),
   unit: z.string().max(20).nullable().optional(),
 });
@@ -81,7 +76,6 @@ export const UpdateProductSchema = z.object({
   brand: z.string().max(200).nullable().optional(),
   barcode: z.string().max(50).nullable().optional(),
   shopId: z.string().nullable().optional(),
-  category: z.string().max(100).nullable().optional(),
   defaultQuantity: z.number().positive().nullable().optional(),
   unit: z.string().max(20).nullable().optional(),
 });

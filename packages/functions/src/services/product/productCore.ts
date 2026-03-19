@@ -27,7 +27,6 @@ export async function createProduct(input: CreateProductInput): Promise<Product>
     brand: input.brand ?? null,
     barcode: input.barcode ?? null,
     shopId: input.shopId ?? null,
-    category: input.category ?? null,
     defaultQuantity: input.defaultQuantity ?? null,
     unit: input.unit ?? null,
     createdAt: now,
@@ -80,7 +79,6 @@ export async function updateProduct(input: UpdateProductInput): Promise<void> {
   if (input.brand !== undefined) updateData.brand = input.brand;
   if (input.barcode !== undefined) updateData.barcode = input.barcode;
   if (input.shopId !== undefined) updateData.shopId = input.shopId;
-  if (input.category !== undefined) updateData.category = input.category;
   if (input.defaultQuantity !== undefined) updateData.defaultQuantity = input.defaultQuantity;
   if (input.unit !== undefined) updateData.unit = input.unit;
 

@@ -43,7 +43,6 @@ export const manageShoppingItemFn = onCall(CALLABLE_CONFIG, async (request) => {
         quantity: item.quantity,
         unit: item.unit,
         shopId: item.shopId,
-        category: item.category,
         createdAt: item.createdAt.toISOString(),
       };
     }

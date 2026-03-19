@@ -10,7 +10,6 @@ export function useUpdateProduct() {
       brand?: string | null;
       barcode?: string | null;
       shopId?: string | null;
-      category?: string | null;
       defaultQuantity?: number | null;
       unit?: string | null;
     }) => {

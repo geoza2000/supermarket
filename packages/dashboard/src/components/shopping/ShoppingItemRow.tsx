@@ -83,18 +83,11 @@ export function ShoppingItemRow({
             {item.brand}
           </span>
         )}
-        {(item.category || shop) && (
+        {shop && (
           <div className="flex items-center gap-1.5 mt-0.5">
-            {item.category && (
-              <Badge variant="secondary" className="text-xs">
-                {item.category}
-              </Badge>
-            )}
-            {shop && (
-              <Badge variant="outline" className="text-xs">
-                {shop.name}
-              </Badge>
-            )}
+            <Badge variant="outline" className="text-xs">
+              {shop.name}
+            </Badge>
           </div>
         )}
       </button>

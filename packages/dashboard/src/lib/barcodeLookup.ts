@@ -1,7 +1,6 @@
 export interface BarcodeLookupResult {
   found: boolean;
   name: string | null;
-  category: string | null;
   quantity: string | null;
   brand: string | null;
 }
@@ -16,12 +15,11 @@ const OPEN_FACTS_BASES = [
 const NOT_FOUND: BarcodeLookupResult = {
   found: false,
   name: null,
-  category: null,
   quantity: null,
   brand: null,
 };
 
-const FIELDS = 'product_name,categories_tags_en,quantity,brands';
+const FIELDS = 'product_name,quantity,brands';
 const HEADERS = { 'User-Agent': 'SupermarketListApp/1.0' };
 
 async function queryOpenFacts(
@@ -41,19 +39,9 @@ async function queryOpenFacts(
   const name: string | null = product.product_name || null;
   const brand: string | null = product.brands || null;
 
-  const categoriesTags: string[] = product.categories_tags_en || [];
-  const category =
-    categoriesTags.length > 0
-      ? categoriesTags[categoriesTags.length - 1]
-          .replace(/^en:/, '')
-          .replace(/-/g, ' ')
-          .replace(/\b\w/g, (c: string) => c.toUpperCase())
-      : null;
-
   return {
     found: true,
     name,
-    category,
     quantity: product.quantity || null,
     brand,
   };
