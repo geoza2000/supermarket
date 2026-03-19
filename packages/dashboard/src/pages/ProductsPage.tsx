@@ -7,7 +7,7 @@ import { useDeleteProduct } from '@/hooks/mutations';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { EditProductDialog, DeleteProductDialog } from '@/components/products';
+import { EditProductDialog, DeleteProductDialog, AssignProductsWizard } from '@/components/products';
 import {
   ArrowLeft,
   Search,
@@ -15,6 +15,7 @@ import {
   Pencil,
   Trash2,
   ScanBarcode,
+  Wand2,
 } from 'lucide-react';
 import type { ProductDocument } from '@supermarket-list/shared';
 
@@ -30,6 +31,10 @@ export function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingProduct, setEditingProduct] = useState<ProductDocument | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<ProductDocument | null>(null);
+  const [wizardOpen, setWizardOpen] = useState(false);
+
+  const hasUnassignedProducts = products.some((p) => !p.shopId);
+  const showWizardButton = shops.length > 0 && hasUnassignedProducts;
 
   const filtered = useMemo(() => {
     if (!searchQuery.trim()) return products;
@@ -63,9 +68,21 @@ export function ProductsPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <h1 className="font-bold text-lg">Products</h1>
-          <Badge variant="secondary" className="ml-auto text-xs">
-            {products.length}
-          </Badge>
+          <div className="ml-auto flex items-center gap-2">
+            {showWizardButton && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setWizardOpen(true)}
+              >
+                <Wand2 className="h-4 w-4 mr-1.5" />
+                Assign
+              </Button>
+            )}
+            <Badge variant="secondary" className="text-xs">
+              {products.length}
+            </Badge>
+          </div>
         </div>
       </header>
 
@@ -184,6 +201,14 @@ export function ProductsPage() {
         productName={deleteTarget?.name ?? ''}
         isDeleting={deleteMutation.isPending}
         onConfirm={handleDelete}
+      />
+
+      <AssignProductsWizard
+        open={wizardOpen}
+        onOpenChange={setWizardOpen}
+        shops={shops}
+        products={products}
+        householdId={householdId}
       />
     </div>
   );
