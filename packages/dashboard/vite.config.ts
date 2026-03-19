@@ -14,8 +14,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['logo.svg', 'favicon.ico', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Supermarket List',
-        short_name: 'supermarket-list',
+        name: 'supermarket-list',
+        short_name: 'Supermarket',
         description: 'An app that helps you with the grocery list, from preparing to buying with the correct aisle order. Skip nothing next time you shop.',
         theme_color: '#16a34a',
         background_color: '#0f172a',
