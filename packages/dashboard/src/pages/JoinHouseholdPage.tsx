@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useAcceptInvitation } from '@/hooks/mutations';
 import { callGetInvitationDetails } from '@/lib/firebase';
@@ -12,6 +12,7 @@ import { Loader2, Home, AlertCircle, CheckCircle2 } from 'lucide-react';
 export function JoinHouseholdPage() {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, loading: authLoading } = useAuthContext();
   const acceptMutation = useAcceptInvitation();
 
@@ -52,7 +53,7 @@ export function JoinHouseholdPage() {
           title="Sign in Required"
           description="You need to sign in before joining a household."
         >
-          <Button className="w-full" onClick={() => navigate('/login')}>
+          <Button className="w-full" onClick={() => navigate('/login', { state: { from: location.pathname } })}>
             Go to Sign In
           </Button>
         </StatusCard>

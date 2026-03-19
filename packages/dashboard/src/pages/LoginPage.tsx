@@ -1,17 +1,19 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 
 export function LoginPage() {
   const { user, loading, signInWithGoogle } = useAuthContext();
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnTo = (location.state as { from?: string })?.from || '/';
 
   useEffect(() => {
     if (!loading && user) {
-      navigate('/');
+      navigate(returnTo);
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, returnTo]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
