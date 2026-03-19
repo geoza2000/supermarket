@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Loader2, Pencil, Check } from 'lucide-react';
+import { Loader2, Check } from 'lucide-react';
 import type { ShoppingItemDocument } from '@supermarket-list/shared';
 import { toast } from '@/hooks/useToast';
 import { ShoppingItemAmountTrigger } from './ShoppingItemAmountTrigger';
 import { ShoppingItemQuantityDialog } from './ShoppingItemQuantityDialog';
+
+const ITEM_LONG_PRESS_MS = 500;
 
 interface ShoppingItemRowProps {
   item: ShoppingItemDocument;
@@ -28,6 +29,19 @@ export function ShoppingItemRow({
   const [qtyEditorOpen, setQtyEditorOpen] = useState(false);
   const [optimisticQty, setOptimisticQty] = useState<number | null>(null);
   const commitGenRef = useRef(0);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressFiredRef = useRef(false);
+
+  const clearLongPressTimer = useCallback(() => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => clearLongPressTimer();
+  }, [clearLongPressTimer]);
 
   useEffect(() => {
     setOptimisticQty(null);
@@ -77,6 +91,30 @@ export function ShoppingItemRow({
     item.completed ? onUncomplete(item.itemId) : onComplete(item.itemId);
   };
 
+  const startItemLongPress = () => {
+    if (disabled || isToggling) return;
+    longPressFiredRef.current = false;
+    clearLongPressTimer();
+    longPressTimerRef.current = setTimeout(() => {
+      longPressTimerRef.current = null;
+      longPressFiredRef.current = true;
+      onEdit(item);
+    }, ITEM_LONG_PRESS_MS);
+  };
+
+  const handleNamePointerDown = (e: React.PointerEvent) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    startItemLongPress();
+  };
+
+  const handleNameClick = () => {
+    if (longPressFiredRef.current) {
+      longPressFiredRef.current = false;
+      return;
+    }
+    handleToggle();
+  };
+
   return (
     <div className="flex items-center min-h-[56px] py-2 pl-4 pr-3 gap-2">
       {/* Checkbox */}
@@ -101,8 +139,13 @@ export function ShoppingItemRow({
       {/* Name + badges — tapping also toggles completion */}
       <button
         type="button"
-        className="flex-1 min-w-0 text-left active:opacity-70 transition-opacity"
-        onClick={handleToggle}
+        className="flex-1 min-w-0 text-left active:opacity-70 transition-opacity select-none touch-manipulation"
+        title="Tap to mark done. Hold to edit."
+        onPointerDown={handleNamePointerDown}
+        onPointerUp={clearLongPressTimer}
+        onPointerCancel={clearLongPressTimer}
+        onPointerLeave={clearLongPressTimer}
+        onClick={handleNameClick}
         disabled={isToggling || disabled}
       >
         <div className="flex items-center gap-2">
@@ -151,17 +194,6 @@ export function ShoppingItemRow({
           />
         </>
       )}
-
-      {/* Edit button */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-9 w-9 shrink-0"
-        onClick={() => onEdit(item)}
-        disabled={disabled}
-      >
-        <Pencil className="h-4 w-4 text-muted-foreground" />
-      </Button>
     </div>
   );
 }
