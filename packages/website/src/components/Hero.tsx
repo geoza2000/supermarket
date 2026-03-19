@@ -1,6 +1,8 @@
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { APP_URL } from '@/config/constants';
 
+const APP_SCREENSHOT = '/app.webp';
+
 export default function Hero() {
   return (
     <section className="relative min-h-[100svh] flex items-center overflow-hidden">
@@ -57,28 +59,19 @@ export default function Hero() {
           <div className="relative mt-16 md:mt-20 animate-fade-up [animation-delay:0.45s]">
             <div className="relative mx-auto w-[280px] sm:w-[320px] md:w-[360px]">
               <div className="relative rounded-[2.5rem] border-[8px] border-surface-900 bg-surface-900 shadow-2xl shadow-surface-900/30 overflow-hidden">
-                {/* Status bar */}
+                {/* Status bar / notch */}
                 <div className="bg-surface-900 h-7 flex items-center justify-center">
                   <div className="w-20 h-5 bg-surface-900 rounded-full" />
                 </div>
-                {/* Screen content  */}
-                <div className="bg-white aspect-[9/16.5] flex flex-col">
-                  <div className="bg-brand-600 px-4 py-3">
-                    <div className="text-white font-display font-bold text-sm">Supermarket List</div>
-                    <div className="text-brand-100 text-xs mt-0.5">My Household</div>
-                  </div>
-                  <div className="flex-1 px-3 py-3 space-y-2.5">
-                    <ShopGroup name="Lidl" items={['Milk 1L', 'Eggs x12', 'Bread']} color="bg-emerald-50 border-emerald-200" />
-                    <ShopGroup name="Aldi" items={['Chicken breast', 'Rice 1kg']} color="bg-blue-50 border-blue-200" />
-                    <ShopGroup name="Local Market" items={['Tomatoes', 'Bananas']} color="bg-amber-50 border-amber-200" />
-                  </div>
-                  <div className="px-3 pb-3">
-                    <div className="flex items-center gap-2 bg-surface-100 rounded-xl px-3 py-2.5">
-                      <div className="w-4 h-4 rounded-full bg-surface-300" />
-                      <span className="text-xs text-surface-900/40">Add item...</span>
-                    </div>
-                  </div>
-                </div>
+                {/* Screen — real app screenshot */}
+                <img
+                  src={APP_SCREENSHOT}
+                  alt="Supermarket List app showing a shared shopping list grouped by store"
+                  className="w-full block"
+                  loading="eager"
+                  width={1206}
+                  height={2420}
+                />
               </div>
             </div>
             {/* Glow effect behind phone */}
@@ -87,19 +80,5 @@ export default function Hero() {
         </div>
       </div>
     </section>
-  );
-}
-
-function ShopGroup({ name, items, color }: { name: string; items: string[]; color: string }) {
-  return (
-    <div className={`rounded-xl border p-2.5 ${color}`}>
-      <div className="text-[10px] font-bold text-surface-900/80 uppercase tracking-wider mb-1.5">{name}</div>
-      {items.map((item) => (
-        <div key={item} className="flex items-center gap-2 py-1">
-          <div className="w-3.5 h-3.5 rounded border-2 border-surface-300 flex-shrink-0" />
-          <span className="text-xs text-surface-900/70">{item}</span>
-        </div>
-      ))}
-    </div>
   );
 }
