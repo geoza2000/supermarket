@@ -18,6 +18,7 @@ import {
   ShopGroup,
   BarcodeScannerDialog,
   CloseAllSessionsDialog,
+  QuickAddBar,
 } from '@/components/shopping';
 import type { ShoppingItemDocument } from '@supermarket-list/shared';
 import { Button } from '@/components/ui/button';
@@ -51,9 +52,15 @@ export function ShoppingListPage() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [scannedBarcode, setScannedBarcode] = useState<string | null>(null);
+  const [prefillName, setPrefillName] = useState('');
   const [togglingItemId, setTogglingItemId] = useState<string | null>(null);
   const [showCloseAll, setShowCloseAll] = useState(false);
   const [isClosingAll, setIsClosingAll] = useState(false);
+
+  const handleOpenFullForm = useCallback((name?: string) => {
+    setPrefillName(name ?? '');
+    setAddDialogOpen(true);
+  }, []);
 
   const handleComplete = useCallback(
     async (itemId: string) => {
@@ -166,7 +173,7 @@ export function ShoppingListPage() {
         </div>
       </header>
 
-      <main className="flex-1 p-4 pb-24 max-w-lg mx-auto w-full">
+      <main className="flex-1 p-4 pb-20 max-w-lg mx-auto w-full">
         {loading ? (
           <div className="space-y-3">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -246,19 +253,22 @@ export function ShoppingListPage() {
         )}
       </main>
 
-      <div className="fixed bottom-6 right-6 z-20">
-        <Button
-          size="icon"
-          className="h-14 w-14 rounded-full shadow-lg"
-          onClick={() => setScannerOpen(true)}
-        >
-          <Camera className="!h-6 !w-6" />
-        </Button>
-      </div>
+      {householdId && (
+        <QuickAddBar
+          householdId={householdId}
+          products={products}
+          pendingItems={pendingItems}
+          onScanBarcode={() => setScannerOpen(true)}
+          onOpenFullForm={handleOpenFullForm}
+        />
+      )}
 
       <AddItemDialog
         open={addDialogOpen}
-        onOpenChange={setAddDialogOpen}
+        onOpenChange={(open) => {
+          setAddDialogOpen(open);
+          if (!open) setPrefillName('');
+        }}
         householdId={householdId!}
         products={products}
         shops={shops}
@@ -268,6 +278,7 @@ export function ShoppingListPage() {
         }}
         scannedBarcode={scannedBarcode}
         onClearBarcode={() => setScannedBarcode(null)}
+        prefillName={prefillName}
       />
 
       <EditItemDialog

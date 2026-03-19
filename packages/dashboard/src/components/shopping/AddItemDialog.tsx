@@ -30,6 +30,7 @@ interface AddItemDialogProps {
   onScanBarcode?: () => void;
   scannedBarcode?: string | null;
   onClearBarcode?: () => void;
+  prefillName?: string;
 }
 
 const COMMON_UNITS = ['pcs', 'kg', 'g', 'liters', 'ml', 'pack', 'dozen'];
@@ -69,6 +70,7 @@ export function AddItemDialog({
   onScanBarcode,
   scannedBarcode,
   onClearBarcode,
+  prefillName,
 }: AddItemDialogProps) {
   const addItemMutation = useAddItem();
 
@@ -81,6 +83,12 @@ export function AddItemDialog({
   const [matchedProduct, setMatchedProduct] = useState<ProductDocument | null>(null);
   const [lookingUp, setLookingUp] = useState(false);
   const [lookupDone, setLookupDone] = useState(false);
+
+  useEffect(() => {
+    if (prefillName && open && !scannedBarcode) {
+      setName(prefillName);
+    }
+  }, [prefillName, open, scannedBarcode]);
 
   useEffect(() => {
     if (!scannedBarcode || !open) return;
