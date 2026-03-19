@@ -7,7 +7,7 @@ export interface BarcodeLookupResult {
 }
 
 const OPEN_FACTS_BASES = [
-  'https://world.openfoodfacts.net',
+  'https://world.openfoodfacts.org',
   'https://world.openbeautyfacts.org',
   'https://world.openpetfoodfacts.org',
   'https://world.openproductsfacts.org',
