@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useHouseholdStore } from '@/stores';
 import { useShops } from '@/hooks/useShops';
@@ -58,6 +58,36 @@ export function ShopsPage() {
   const [editingShop, setEditingShop] = useState<ShopDocument | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<ShopDocument | null>(null);
   const [form, setForm] = useState<ShopFormData>(defaultForm);
+  const [optimisticOrder, setOptimisticOrder] = useState<string[] | null>(null);
+  const reorderGenRef = useRef(0);
+
+  useEffect(() => {
+    setOptimisticOrder(null);
+  }, [householdId]);
+
+  const displayShops = useMemo(() => {
+    if (!optimisticOrder || optimisticOrder.length !== shops.length) {
+      return shops;
+    }
+    const byId = new Map(shops.map((s) => [s.shopId, s]));
+    const next = optimisticOrder
+      .map((id) => byId.get(id))
+      .filter((s): s is ShopDocument => s != null);
+    return next.length === shops.length ? next : shops;
+  }, [shops, optimisticOrder]);
+
+  useEffect(() => {
+    if (!optimisticOrder) return;
+    if (optimisticOrder.length !== shops.length) {
+      setOptimisticOrder(null);
+      return;
+    }
+    const serverIds = shops.map((s) => s.shopId);
+    const matches = optimisticOrder.every((id, i) => id === serverIds[i]);
+    if (matches) {
+      setOptimisticOrder(null);
+    }
+  }, [shops, optimisticOrder]);
 
   const openCreateForm = () => {
     setEditingShop(null);
@@ -110,13 +140,30 @@ export function ShopsPage() {
     setDeleteTarget(null);
   };
 
-  const handleReorder = async (orderedShopIds: string[]) => {
-    try {
-      await reorderMutation.mutateAsync({ householdId, orderedShopIds });
-    } catch {
-      toast({ title: 'Failed to save order', variant: 'destructive' });
-    }
-  };
+  const handleReorder = useCallback(
+    async (orderedShopIds: string[]) => {
+      if (!householdId) {
+        throw new Error('No household');
+      }
+      const gen = ++reorderGenRef.current;
+      setOptimisticOrder(orderedShopIds);
+      try {
+        await reorderMutation.mutateAsync({ householdId, orderedShopIds });
+      } catch (err) {
+        if (reorderGenRef.current !== gen) return;
+        setOptimisticOrder(null);
+        toast({
+          title: 'Failed to save order',
+          description:
+            err instanceof Error
+              ? err.message
+              : 'Could not save shop order. Check your connection and try again.',
+          variant: 'destructive',
+        });
+      }
+    },
+    [householdId, reorderMutation]
+  );
 
   const isSaving = createMutation.isPending || updateMutation.isPending;
 
@@ -163,8 +210,8 @@ export function ShopsPage() {
               {!isOnline && ' Reordering needs a connection.'}
             </p>
             <SortableShopList
-              shops={shops}
-              disabled={!isOnline || reorderMutation.isPending}
+              shops={displayShops}
+              disabled={!isOnline}
               formatVisitPeriod={formatVisitPeriod}
               formatLastVisited={formatLastVisited}
               onEdit={openEditForm}
