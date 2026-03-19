@@ -16,6 +16,7 @@ import {
   ReCaptchaV3Provider,
   AppCheck,
 } from 'firebase/app-check';
+import { getAnalytics, Analytics, isSupported } from 'firebase/analytics';
 import { getFirebaseMessagingSwRegistration } from './serviceWorkerManager';
 
 const firebaseConfig = {
@@ -37,6 +38,7 @@ let auth: Auth;
 let functions: Functions;
 let appCheck: AppCheck | null = null;
 let messaging: Messaging | null = null;
+let analytics: Analytics | null = null;
 
 if (getApps().length === 0) {
   app = initializeApp(firebaseConfig);
@@ -87,9 +89,18 @@ if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
   }
 }
 
+// Initialize Analytics (production / live only; skip with emulators)
+if (!USE_EMULATORS && firebaseConfig.measurementId) {
+  isSupported().then((supported) => {
+    if (supported) {
+      analytics = getAnalytics(app);
+    }
+  });
+}
+
 const googleProvider = new GoogleAuthProvider();
 
-export { app, db, auth, functions, appCheck, messaging, googleProvider, USE_EMULATORS };
+export { app, db, auth, functions, appCheck, messaging, analytics, googleProvider, USE_EMULATORS };
 
 // Collection names
 export const Collections = {
