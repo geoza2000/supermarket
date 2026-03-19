@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useHouseholdStore } from '@/stores';
 import { useShoppingList } from '@/hooks/useShoppingList';
@@ -22,6 +22,7 @@ import {
   QuickAddBar,
 } from '@/components/shopping';
 import type { ShoppingItemDocument } from '@supermarket-list/shared';
+import { sortShopDocumentsByDisplayOrder } from '@supermarket-list/shared';
 import { InstallPWABanner } from '@/components/pwa';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -137,7 +138,20 @@ export function ShoppingListPage() {
     }
   };
 
-  const shopIds = Object.keys(itemsByShop);
+  const shopIdsOrdered = useMemo(() => {
+    const keysWithItems = Object.keys(itemsByShop);
+    const assignedKeys = keysWithItems.filter((k) => k !== '__unassigned__');
+    const withDisplayOrder = sortShopDocumentsByDisplayOrder(
+      shops.filter((s) => assignedKeys.includes(s.shopId))
+    );
+    const orderedAssigned = withDisplayOrder.map((s) => s.shopId);
+    const orphanAssigned = assignedKeys.filter((id) => !orderedAssigned.includes(id));
+    orphanAssigned.sort((a, b) =>
+      (shopMap[a]?.name ?? a).localeCompare(shopMap[b]?.name ?? b)
+    );
+    const tail = keysWithItems.includes('__unassigned__') ? ['__unassigned__'] : [];
+    return [...orderedAssigned, ...orphanAssigned, ...tail];
+  }, [itemsByShop, shops, shopMap]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -205,7 +219,7 @@ export function ShoppingListPage() {
           </div>
         ) : (
           <div className="space-y-4">
-            {shopIds.map((key) => {
+            {shopIdsOrdered.map((key) => {
               const isUnassigned = key === '__unassigned__';
               const groupItems = itemsByShop[key];
               const allItems = [

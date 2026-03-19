@@ -2,20 +2,18 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useHouseholdStore } from '@/stores';
 import { useShops } from '@/hooks/useShops';
-import { useCreateShop, useUpdateShop, useDeleteShop } from '@/hooks/mutations';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { ShopFormDialog, DeleteShopDialog } from '@/components/shops';
-import type { ShopFormData } from '@/components/shops';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
+import { toast } from '@/hooks/useToast';
 import {
-  ArrowLeft,
-  Plus,
-  Pencil,
-  Trash2,
-  Store,
-  Clock,
-} from 'lucide-react';
+  useCreateShop,
+  useUpdateShop,
+  useDeleteShop,
+  useReorderShops,
+} from '@/hooks/mutations';
+import { Button } from '@/components/ui/button';
+import { ShopFormDialog, DeleteShopDialog, SortableShopList } from '@/components/shops';
+import type { ShopFormData } from '@/components/shops';
+import { ArrowLeft, Plus, Store } from 'lucide-react';
 import type { ShopDocument, VisitPeriod } from '@supermarket-list/shared';
 
 function formatLastVisited(lastVisitedAt: string | null): string {
@@ -49,10 +47,12 @@ export function ShopsPage() {
   const activeHousehold = useHouseholdStore((s) => s.activeHousehold);
   const householdId = activeHousehold?.householdId ?? '';
   const { shops, loading } = useShops(householdId || null);
+  const isOnline = useOnlineStatus();
 
   const createMutation = useCreateShop();
   const updateMutation = useUpdateShop();
   const deleteMutation = useDeleteShop();
+  const reorderMutation = useReorderShops();
 
   const [showForm, setShowForm] = useState(false);
   const [editingShop, setEditingShop] = useState<ShopDocument | null>(null);
@@ -110,6 +110,14 @@ export function ShopsPage() {
     setDeleteTarget(null);
   };
 
+  const handleReorder = async (orderedShopIds: string[]) => {
+    try {
+      await reorderMutation.mutateAsync({ householdId, orderedShopIds });
+    } catch {
+      toast({ title: 'Failed to save order', variant: 'destructive' });
+    }
+  };
+
   const isSaving = createMutation.isPending || updateMutation.isPending;
 
   return (
@@ -150,43 +158,19 @@ export function ShopsPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            {shops.map((shop) => (
-              <Card key={shop.shopId}>
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <h3 className="font-semibold">{shop.name}</h3>
-                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3.5 w-3.5" />
-                          {formatVisitPeriod(shop.visitPeriod)}
-                        </span>
-                        <Separator orientation="vertical" className="h-4" />
-                        <span>Last: {formatLastVisited(shop.lastVisitedAt)}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => openEditForm(shop)}
-                      >
-                        <Pencil className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-destructive"
-                        onClick={() => setDeleteTarget(shop)}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+            <p className="text-sm text-muted-foreground">
+              Drag shops by the handle to set the order they appear on your shopping list.
+              {!isOnline && ' Reordering needs a connection.'}
+            </p>
+            <SortableShopList
+              shops={shops}
+              disabled={!isOnline || reorderMutation.isPending}
+              formatVisitPeriod={formatVisitPeriod}
+              formatLastVisited={formatLastVisited}
+              onEdit={openEditForm}
+              onDelete={setDeleteTarget}
+              onReorder={handleReorder}
+            />
           </div>
         )}
       </main>

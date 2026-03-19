@@ -61,3 +61,21 @@ export function useDeleteShop() {
     },
   });
 }
+
+export function useReorderShops() {
+  return useMutation({
+    mutationFn: async ({
+      householdId,
+      orderedShopIds,
+    }: {
+      householdId: string;
+      orderedShopIds: string[];
+    }) => {
+      const result = await callManageShop({
+        action: 'reorder',
+        data: { householdId, orderedShopIds },
+      });
+      return result.data;
+    },
+  });
+}

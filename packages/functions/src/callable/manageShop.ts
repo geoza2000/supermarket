@@ -2,7 +2,7 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { logger } from 'firebase-functions/v2';
 import { ManageShopSchema } from '@supermarket-list/shared';
 import { getHouseholdById, isHouseholdMember } from '../services';
-import { createShop, updateShop, deleteShop } from '../services/shop';
+import { createShop, updateShop, deleteShop, reorderShops } from '../services/shop';
 import { requireAllowedUser } from '../utils/requireAllowedUser';
 import { CALLABLE_CONFIG } from '../config';
 
@@ -43,6 +43,10 @@ export const manageShopFn = onCall(CALLABLE_CONFIG, async (request) => {
     }
     case 'delete': {
       await deleteShop(data.householdId, data.shopId);
+      return { success: true };
+    }
+    case 'reorder': {
+      await reorderShops(data);
       return { success: true };
     }
   }

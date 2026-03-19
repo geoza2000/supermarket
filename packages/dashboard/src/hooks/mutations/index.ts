@@ -16,7 +16,12 @@ export {
 export { useCreateInvitation, useAcceptInvitation } from './useInvitationMutations';
 
 // Shops
-export { useCreateShop, useUpdateShop, useDeleteShop } from './useShopMutations';
+export {
+  useCreateShop,
+  useUpdateShop,
+  useDeleteShop,
+  useReorderShops,
+} from './useShopMutations';
 
 // Products
 export { useUpdateProduct, useDeleteProduct } from './useProductMutations';

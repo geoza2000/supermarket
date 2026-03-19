@@ -2,6 +2,7 @@ export {
   createShop,
   getShopById,
   getShopsByHousehold,
+  reorderShops,
   updateShop,
   deleteShop,
   updateShopLastVisited,

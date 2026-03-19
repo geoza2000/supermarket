@@ -1,3 +1,4 @@
+import { HttpsError } from 'firebase-functions/v2/https';
 import { db } from '../../admin';
 import type {
   Shop,
@@ -5,8 +6,13 @@ import type {
   CreateShopInput,
   UpdateShopInput,
   VisitPeriod,
+  ReorderShopsInput,
 } from '@supermarket-list/shared';
-import { shopToDocument, documentToShop } from '@supermarket-list/shared';
+import {
+  shopToDocument,
+  documentToShop,
+  sortShopDocumentsByDisplayOrder,
+} from '@supermarket-list/shared';
 import { HOUSEHOLDS_COLLECTION } from '../household/constants';
 import { SHOPS_SUBCOLLECTION } from './constants';
 import { ITEMS_SUBCOLLECTION } from '../shoppingList/constants';
@@ -22,6 +28,14 @@ function shopsCollection(householdId: string) {
 export async function createShop(input: CreateShopInput): Promise<Shop> {
   const now = new Date();
   const docRef = shopsCollection(input.householdId).doc();
+  const snapshot = await shopsCollection(input.householdId).get();
+  let maxOrder = -1;
+  for (const d of snapshot.docs) {
+    const data = d.data() as ShopDocument;
+    if (typeof data.sortOrder === 'number' && data.sortOrder > maxOrder) {
+      maxOrder = data.sortOrder;
+    }
+  }
 
   const shop: Shop = {
     shopId: docRef.id,
@@ -30,6 +44,7 @@ export async function createShop(input: CreateShopInput): Promise<Shop> {
     visitPeriod: input.visitPeriod ?? null,
     lastVisitedAt: null,
     lastNotifiedAt: null,
+    sortOrder: maxOrder + 1,
     createdAt: now,
     updatedAt: now,
   };
@@ -50,8 +65,41 @@ export async function getShopById(
 export async function getShopsByHousehold(
   householdId: string
 ): Promise<Shop[]> {
-  const snapshot = await shopsCollection(householdId).orderBy('name').get();
-  return snapshot.docs.map((doc) => documentToShop(doc.data() as ShopDocument));
+  const snapshot = await shopsCollection(householdId).get();
+  const docs = snapshot.docs.map((doc) => doc.data() as ShopDocument);
+  const sorted = sortShopDocumentsByDisplayOrder(docs);
+  return sorted.map((d) => documentToShop(d));
+}
+
+export async function reorderShops(input: ReorderShopsInput): Promise<void> {
+  const coll = shopsCollection(input.householdId);
+  const snapshot = await coll.get();
+  const existing = new Set(snapshot.docs.map((d) => d.id));
+
+  if (input.orderedShopIds.length !== existing.size) {
+    throw new HttpsError(
+      'invalid-argument',
+      'orderedShopIds must list every shop once'
+    );
+  }
+
+  const seen = new Set<string>();
+  for (const id of input.orderedShopIds) {
+    if (!existing.has(id) || seen.has(id)) {
+      throw new HttpsError(
+        'invalid-argument',
+        'orderedShopIds must list every shop once'
+      );
+    }
+    seen.add(id);
+  }
+
+  const batch = db.batch();
+  const now = new Date().toISOString();
+  input.orderedShopIds.forEach((shopId, index) => {
+    batch.update(coll.doc(shopId), { sortOrder: index, updatedAt: now });
+  });
+  await batch.commit();
 }
 
 export async function updateShop(input: UpdateShopInput): Promise<void> {
