@@ -27,6 +27,11 @@ service cloud.firestore {
           'updatedAt'
         ]);
       allow delete: if false;
+
+      // FCM registration tokens — Cloud Functions (Admin SDK) only
+      match /fcmTokens/{tokenId} {
+        allow read, write: if false;
+      }
     }
 
     // Households collection - reads for members, writes via Cloud Functions
@@ -34,19 +39,20 @@ service cloud.firestore {
       allow read: if isHouseholdMember(householdId);
       allow create, update, delete: if false;
 
-      // Shops subcollection - full access for household members
+      // Shops — client read-only; writes go through Cloud Functions
       match /shops/{shopId} {
-        allow read, write: if isHouseholdMember(householdId);
+        allow read: if isHouseholdMember(householdId);
+        allow write: if false;
       }
 
-      // Products subcollection - full access for household members
       match /products/{productId} {
-        allow read, write: if isHouseholdMember(householdId);
+        allow read: if isHouseholdMember(householdId);
+        allow write: if false;
       }
 
-      // Items subcollection - full access for household members
       match /items/{itemId} {
-        allow read, write: if isHouseholdMember(householdId);
+        allow read: if isHouseholdMember(householdId);
+        allow write: if false;
       }
     }
 

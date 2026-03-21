@@ -1,7 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { GetInvitationDetailsSchema } from '@supermarket-list/shared';
 import { getInvitationDetails } from '../services';
-import { requireAuth } from '../utils/requireAllowedUser';
+import { requireAuth } from '../utils/requireAuth';
 import { CALLABLE_CONFIG } from '../config';
 
 export const getInvitationDetailsFn = onCall(CALLABLE_CONFIG, async (request) => {

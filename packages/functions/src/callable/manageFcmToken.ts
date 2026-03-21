@@ -1,7 +1,10 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { logger } from 'firebase-functions/v2';
-import { FieldValue } from 'firebase-admin/firestore';
-import { db } from '../admin';
+import { createUser } from '../services/user/userCore';
+import {
+  registerFcmToken,
+  unregisterFcmToken,
+} from '../services/user/fcmTokenStore';
 import { CALLABLE_CONFIG } from '../config';
 
 interface ManageFcmTokenRequest {
@@ -13,6 +16,8 @@ interface ManageFcmTokenRequest {
  * Callable function to manage FCM tokens (register or unregister)
  * - action: 'register' adds the token (default)
  * - action: 'unregister' removes the token
+ * Tokens are stored under users/{uid}/fcmTokens/{hash} (no client read/write).
+ * Max 20 tokens per user; oldest registrations are removed when over capacity.
  * Protected by: Auth, App Check
  */
 export const manageFcmToken = onCall(CALLABLE_CONFIG, async (request) => {
@@ -30,53 +35,24 @@ export const manageFcmToken = onCall(CALLABLE_CONFIG, async (request) => {
     throw new HttpsError('invalid-argument', 'Action must be "register" or "unregister"');
   }
 
-  const userRef = db.collection('users').doc(request.auth.uid);
+  const uid = request.auth.uid;
 
-  // Check if user document exists, create if not
-  const userDoc = await userRef.get();
-
-  if (!userDoc.exists) {
-    // Create user document with FCM token
-    await userRef.set({
-      userId: request.auth.uid,
-      email: request.auth.token.email || null,
-      notifications: {
-        fcmTokens: action === 'register' ? [token] : [],
-      },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    });
-
-    logger.info('User document created with FCM token', {
-      userId: request.auth.uid,
-      action,
+  if (action === 'unregister') {
+    await unregisterFcmToken(uid, token);
+    logger.info('FCM token unregistered', {
+      userId: uid,
       tokenPrefix: token.substring(0, 20) + '...',
     });
-
     return { success: true };
   }
 
-  if (action === 'register') {
-    await userRef.update({
-      'notifications.fcmTokens': FieldValue.arrayUnion(token),
-      updatedAt: new Date().toISOString(),
-    });
+  await createUser({ userId: uid });
+  await registerFcmToken(uid, token);
 
-    logger.info('FCM token registered', {
-      userId: request.auth.uid,
-      tokenPrefix: token.substring(0, 20) + '...',
-    });
-  } else {
-    await userRef.update({
-      'notifications.fcmTokens': FieldValue.arrayRemove(token),
-      updatedAt: new Date().toISOString(),
-    });
-
-    logger.info('FCM token unregistered', {
-      userId: request.auth.uid,
-      tokenPrefix: token.substring(0, 20) + '...',
-    });
-  }
+  logger.info('FCM token registered', {
+    userId: uid,
+    tokenPrefix: token.substring(0, 20) + '...',
+  });
 
   return { success: true };
 });

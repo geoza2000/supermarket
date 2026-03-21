@@ -9,13 +9,13 @@ import {
   transferOwnership,
   deleteHousehold,
 } from '../services';
-import { requireAllowedUser } from '../utils/requireAllowedUser';
+import { requireAuth } from '../utils/requireAuth';
 import { CALLABLE_CONFIG } from '../config';
 import { db } from '../admin';
 import { USERS_COLLECTION } from '../services/user/constants';
 
 export const leaveHouseholdFn = onCall(CALLABLE_CONFIG, async (request) => {
-  const userId = requireAllowedUser(request);
+  const userId = requireAuth(request);
 
   const parsed = LeaveHouseholdSchema.safeParse(request.data);
   if (!parsed.success) {

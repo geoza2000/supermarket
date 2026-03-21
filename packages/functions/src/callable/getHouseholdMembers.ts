@@ -1,12 +1,12 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { admin } from '../admin';
 import { getHouseholdById, isHouseholdMember } from '../services';
-import { requireAllowedUser } from '../utils/requireAllowedUser';
+import { requireAuth } from '../utils/requireAuth';
 import { CALLABLE_CONFIG } from '../config';
 import type { HouseholdMember } from '@supermarket-list/shared';
 
 export const getHouseholdMembersFn = onCall(CALLABLE_CONFIG, async (request) => {
-  const userId = requireAllowedUser(request);
+  const userId = requireAuth(request);
 
   const { householdId } = request.data as { householdId: string };
   if (!householdId) {

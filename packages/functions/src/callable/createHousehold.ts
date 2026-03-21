@@ -2,11 +2,11 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { logger } from 'firebase-functions/v2';
 import { CreateHouseholdSchema } from '@supermarket-list/shared';
 import { createHousehold } from '../services';
-import { requireAllowedUser } from '../utils/requireAllowedUser';
+import { requireAuth } from '../utils/requireAuth';
 import { CALLABLE_CONFIG } from '../config';
 
 export const createHouseholdFn = onCall(CALLABLE_CONFIG, async (request) => {
-  const userId = requireAllowedUser(request);
+  const userId = requireAuth(request);
 
   const parsed = CreateHouseholdSchema.safeParse(request.data);
   if (!parsed.success) {

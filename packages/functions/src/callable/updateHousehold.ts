@@ -6,11 +6,11 @@ import {
   isHouseholdOwner,
   updateHouseholdName,
 } from '../services';
-import { requireAllowedUser } from '../utils/requireAllowedUser';
+import { requireAuth } from '../utils/requireAuth';
 import { CALLABLE_CONFIG } from '../config';
 
 export const updateHouseholdFn = onCall(CALLABLE_CONFIG, async (request) => {
-  const userId = requireAllowedUser(request);
+  const userId = requireAuth(request);
 
   const parsed = UpdateHouseholdSchema.safeParse(request.data);
   if (!parsed.success) {

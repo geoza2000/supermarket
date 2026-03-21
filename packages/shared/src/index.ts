@@ -6,6 +6,3 @@ export * from './types/invitation';
 export * from './types/shop';
 export * from './types/product';
 export * from './types/item';
-
-// Constants
-export * from './constants';

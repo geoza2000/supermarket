@@ -1,14 +1,8 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { logger } from 'firebase-functions/v2';
-import { db } from '../admin';
 import { sendNotification } from '../services';
+import { listFcmTokensForUser } from '../services/user/fcmTokenStore';
 import { CALLABLE_CONFIG } from '../config';
-
-interface UserData {
-  notifications?: {
-    fcmTokens?: string[];
-  };
-}
 
 /**
  * Callable function to send test notification
@@ -23,23 +17,13 @@ export const sendTestNotification = onCall(CALLABLE_CONFIG, async (request) => {
   const userId = request.auth.uid;
   const { currentToken } = (request.data || {}) as { currentToken?: string };
 
-  // Fetch user tokens
-  const userDoc = await db.collection('users').doc(userId).get();
-
-  if (!userDoc.exists) {
-    logger.error('User not found for test notification', { userId });
-    throw new HttpsError('not-found', 'User not found');
-  }
-
-  const user = userDoc.data() as UserData;
-  const fcmTokens = user.notifications?.fcmTokens || [];
+  const fcmTokens = await listFcmTokensForUser(userId);
 
   if (fcmTokens.length === 0) {
     logger.error('No FCM tokens registered for test notification', { userId });
     throw new HttpsError('failed-precondition', 'No FCM tokens registered');
   }
 
-  // Check if current device's token is in the registered tokens
   const tokenFound = currentToken ? fcmTokens.includes(currentToken) : false;
 
   if (currentToken && !tokenFound) {
@@ -50,7 +34,6 @@ export const sendTestNotification = onCall(CALLABLE_CONFIG, async (request) => {
     });
   }
 
-  // Send notification using the service
   const result = await sendNotification(userId, fcmTokens, {
     title: '🔔 Test Notification',
     body: 'Your notifications are working correctly!',

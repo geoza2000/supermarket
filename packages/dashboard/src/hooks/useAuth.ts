@@ -63,8 +63,8 @@ export function useAuth(): UseAuthResult {
             photoUrl: firebaseUser.photoURL,
             settings: data.settings || { theme: 'system' },
             notifications: {
-              enabled: (data.notifications?.fcmTokens?.length || 0) > 0,
-              tokenCount: data.notifications?.fcmTokens?.length || 0,
+              enabled: (data.notifications?.registeredDeviceCount || 0) > 0,
+              tokenCount: data.notifications?.registeredDeviceCount || 0,
             },
             householdIds: data.householdIds || [],
             activeHouseholdId: data.activeHouseholdId || null,

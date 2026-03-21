@@ -3,11 +3,11 @@ import { logger } from 'firebase-functions/v2';
 import { ManageShopSchema } from '@supermarket-list/shared';
 import { getHouseholdById, isHouseholdMember } from '../services';
 import { createShop, updateShop, deleteShop, reorderShops } from '../services/shop';
-import { requireAllowedUser } from '../utils/requireAllowedUser';
+import { requireAuth } from '../utils/requireAuth';
 import { CALLABLE_CONFIG } from '../config';
 
 export const manageShopFn = onCall(CALLABLE_CONFIG, async (request) => {
-  const userId = requireAllowedUser(request);
+  const userId = requireAuth(request);
 
   const parsed = ManageShopSchema.safeParse(request.data);
   if (!parsed.success) {

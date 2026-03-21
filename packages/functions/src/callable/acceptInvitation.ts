@@ -7,7 +7,7 @@ import {
   getHouseholdById,
   isHouseholdMember,
 } from '../services';
-import { requireAuth } from '../utils/requireAllowedUser';
+import { requireAuth } from '../utils/requireAuth';
 import { CALLABLE_CONFIG } from '../config';
 
 export const acceptInvitationFn = onCall(CALLABLE_CONFIG, async (request) => {

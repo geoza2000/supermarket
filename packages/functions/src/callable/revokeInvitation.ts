@@ -7,11 +7,11 @@ import {
   getHouseholdById,
   isHouseholdOwner,
 } from '../services';
-import { requireAllowedUser } from '../utils/requireAllowedUser';
+import { requireAuth } from '../utils/requireAuth';
 import { CALLABLE_CONFIG } from '../config';
 
 export const revokeInvitationFn = onCall(CALLABLE_CONFIG, async (request) => {
-  const userId = requireAllowedUser(request);
+  const userId = requireAuth(request);
 
   const parsed = RevokeInvitationSchema.safeParse(request.data);
   if (!parsed.success) {

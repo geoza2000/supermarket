@@ -4,11 +4,11 @@ import { ManageProductSchema } from '@supermarket-list/shared';
 import { getHouseholdById, isHouseholdMember } from '../services';
 import { createProduct, updateProduct, deleteProduct } from '../services/product';
 import { updateItemsByProductId } from '../services/shoppingList';
-import { requireAllowedUser } from '../utils/requireAllowedUser';
+import { requireAuth } from '../utils/requireAuth';
 import { CALLABLE_CONFIG } from '../config';
 
 export const manageProductFn = onCall(CALLABLE_CONFIG, async (request) => {
-  const userId = requireAllowedUser(request);
+  const userId = requireAuth(request);
 
   const parsed = ManageProductSchema.safeParse(request.data);
   if (!parsed.success) {

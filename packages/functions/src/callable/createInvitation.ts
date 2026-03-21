@@ -6,11 +6,11 @@ import {
   isHouseholdMember,
   createInvitation,
 } from '../services';
-import { requireAllowedUser } from '../utils/requireAllowedUser';
+import { requireAuth } from '../utils/requireAuth';
 import { CALLABLE_CONFIG } from '../config';
 
 export const createInvitationFn = onCall(CALLABLE_CONFIG, async (request) => {
-  const userId = requireAllowedUser(request);
+  const userId = requireAuth(request);
 
   const parsed = CreateInvitationSchema.safeParse(request.data);
   if (!parsed.success) {

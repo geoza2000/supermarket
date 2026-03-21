@@ -5,9 +5,10 @@ export interface UserSettings {
   theme: 'light' | 'dark' | 'system';
 }
 
-// Notification settings
+// Notification settings (stored on user doc — no raw FCM tokens here)
 export interface NotificationSettings {
-  fcmTokens: string[];
+  /** Maintained by Cloud Functions from the fcmTokens subcollection (max 20). */
+  registeredDeviceCount: number;
 }
 
 // Core User interface (stored in Firestore)
@@ -40,7 +41,7 @@ export interface CreateUserInput {
   userId: string;
 }
 
-// User profile returned to client (excludes sensitive data like fcmTokens)
+// User profile returned to client (push device count only; tokens live in a private subcollection)
 // Note: email, displayName and photoUrl should be merged from Firebase Auth on the client
 export interface UserProfile {
   userId: string;
@@ -60,7 +61,7 @@ export const UserSettingsSchema = z.object({
 });
 
 export const NotificationSettingsSchema = z.object({
-  fcmTokens: z.array(z.string()),
+  registeredDeviceCount: z.number().int().min(0).max(20),
 });
 
 export const CreateUserSchema = z.object({
@@ -77,10 +78,26 @@ export function userToDocument(user: User): UserDocument {
   };
 }
 
+/** Normalize Firestore notifications (supports legacy fcmTokens[] until migrated). */
+export function parseNotificationSettingsFromDoc(raw: unknown): NotificationSettings {
+  if (raw && typeof raw === 'object') {
+    const o = raw as Record<string, unknown>;
+    if (typeof o.registeredDeviceCount === 'number' && Number.isFinite(o.registeredDeviceCount)) {
+      return {
+        registeredDeviceCount: Math.max(0, Math.min(20, Math.floor(o.registeredDeviceCount))),
+      };
+    }
+    if (Array.isArray(o.fcmTokens)) {
+      return { registeredDeviceCount: o.fcmTokens.length };
+    }
+  }
+  return getDefaultNotificationSettings();
+}
+
 export function documentToUser(doc: UserDocument): User {
   return {
     ...doc,
-    notifications: doc.notifications || getDefaultNotificationSettings(),
+    notifications: parseNotificationSettingsFromDoc(doc.notifications),
     householdIds: doc.householdIds || [],
     activeHouseholdId: doc.activeHouseholdId || null,
     lastLoginAt: new Date(doc.lastLoginAt),
@@ -95,17 +112,18 @@ export function getDefaultUserSettings(): UserSettings {
 
 export function getDefaultNotificationSettings(): NotificationSettings {
   return {
-    fcmTokens: [],
+    registeredDeviceCount: 0,
   };
 }
 
 export function userToProfile(user: User): UserProfile {
+  const n = user.notifications.registeredDeviceCount;
   return {
     userId: user.userId,
     settings: user.settings,
     notifications: {
-      enabled: user.notifications.fcmTokens.length > 0,
-      tokenCount: user.notifications.fcmTokens.length,
+      enabled: n > 0,
+      tokenCount: n,
     },
     householdIds: user.householdIds,
     activeHouseholdId: user.activeHouseholdId,

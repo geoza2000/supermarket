@@ -3,11 +3,11 @@ import { logger } from 'firebase-functions/v2';
 import { CloseShoppingSessionSchema } from '@supermarket-list/shared';
 import { getHouseholdById, isHouseholdMember } from '../services';
 import { closeShoppingSession } from '../services/shoppingList';
-import { requireAllowedUser } from '../utils/requireAllowedUser';
+import { requireAuth } from '../utils/requireAuth';
 import { CALLABLE_CONFIG } from '../config';
 
 export const closeShoppingSessionFn = onCall(CALLABLE_CONFIG, async (request) => {
-  const userId = requireAllowedUser(request);
+  const userId = requireAuth(request);
 
   const parsed = CloseShoppingSessionSchema.safeParse(request.data);
   if (!parsed.success) {

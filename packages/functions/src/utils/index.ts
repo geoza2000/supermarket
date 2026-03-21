@@ -1,1 +1,1 @@
-export { requireAllowedUser, requireAuth } from './requireAllowedUser';
+export { requireAuth } from './requireAuth';
