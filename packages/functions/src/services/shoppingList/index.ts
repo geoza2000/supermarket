@@ -8,3 +8,4 @@ export {
   closeShoppingSession,
 } from './shoppingListCore';
 export { ITEMS_SUBCOLLECTION } from './constants';
+export { recordPendingItemAddNotification } from './itemAddNotificationBatch';

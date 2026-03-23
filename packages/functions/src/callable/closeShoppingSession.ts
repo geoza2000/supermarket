@@ -1,8 +1,13 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { logger } from 'firebase-functions/v2';
 import { CloseShoppingSessionSchema } from '@supermarket-list/shared';
-import { getHouseholdById, isHouseholdMember } from '../services';
+import {
+  getHouseholdById,
+  isHouseholdMember,
+  sendNotificationToHouseholdMembers,
+} from '../services';
 import { closeShoppingSession } from '../services/shoppingList';
+import { getAuthDisplayName } from '../utils/authDisplayName';
 import { requireAuth } from '../utils/requireAuth';
 import { CALLABLE_CONFIG } from '../config';
 
@@ -32,6 +37,33 @@ export const closeShoppingSessionFn = onCall(CALLABLE_CONFIG, async (request) =>
   });
 
   const result = await closeShoppingSession(householdId, shopId, closeAll);
+
+  if (result.clearedCount > 0) {
+    try {
+      const displayName = await getAuthDisplayName(userId);
+      const n = result.clearedCount;
+      const body =
+        n === 1
+          ? `${displayName} cleared 1 item from the shopping list`
+          : `${displayName} cleared ${n} items from the shopping list`;
+
+      await sendNotificationToHouseholdMembers(household.memberIds, {
+        title: 'Shopping trip complete',
+        body,
+        type: 'shopping_complete',
+        deepLink: '/',
+        data: {
+          householdId,
+          clearedCount: String(n),
+        },
+      });
+    } catch (error) {
+      logger.error('Failed to send shopping-complete notifications', {
+        householdId,
+        error: error instanceof Error ? error.message : error,
+      });
+    }
+  }
 
   return result;
 });

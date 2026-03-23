@@ -54,6 +54,10 @@ service cloud.firestore {
         allow read: if isHouseholdMember(householdId);
         allow write: if false;
       }
+
+      match /itemAddNotificationBatches/{userId} {
+        allow read, write: if false;
+      }
     }
 
     // Invitations - all access through Cloud Functions (Admin SDK)

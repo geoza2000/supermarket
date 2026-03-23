@@ -36,3 +36,4 @@ export { healthCheck } from './https/healthCheck';
 
 // Scheduler (onSchedule)
 export { checkVisitRemindersFn as checkVisitReminders } from './scheduler/checkVisitReminders';
+export { flushPendingItemAddNotificationsFn as flushPendingItemAddNotifications } from './scheduler/flushPendingItemAddNotifications';

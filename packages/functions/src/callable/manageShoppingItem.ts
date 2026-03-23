@@ -8,6 +8,7 @@ import {
   completeItem,
   uncompleteItem,
   removeItem,
+  recordPendingItemAddNotification,
 } from '../services/shoppingList';
 import { requireAuth } from '../utils/requireAuth';
 import { CALLABLE_CONFIG } from '../config';
@@ -36,6 +37,7 @@ export const manageShoppingItemFn = onCall(CALLABLE_CONFIG, async (request) => {
   switch (action) {
     case 'add': {
       const item = await addItem(data, userId);
+      await recordPendingItemAddNotification(householdId, userId, item.name);
       return {
         itemId: item.itemId,
         productId: item.productId,

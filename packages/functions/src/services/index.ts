@@ -2,6 +2,7 @@
 export {
   sendNotification,
   sendNotificationToUser,
+  sendNotificationToHouseholdMembers,
   type SendNotificationOptions,
   type SendNotificationResult,
   type SendNotificationToUserResult,
